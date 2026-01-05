@@ -8,7 +8,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
 from typing import Dict
 import json
 
-from app.agents.astrology_agent import astrology_agent
+from app.agents.graph_agent import astrology_graph_agent
 from app.core.security import get_user_id_from_token
 from app.core.logging_config import logger
 from app.models.user import UserDB
@@ -136,7 +136,7 @@ async def websocket_chat(
 
     # Send welcome message
     from app.agents.prompts import get_welcome_message
-    natal_summary = astrology_agent._create_natal_summary(natal_chart_data)
+    natal_summary = astrology_graph_agent._create_natal_summary(natal_chart_data)
     welcome_msg = get_welcome_message(natal_summary)
 
     await manager.send_message(user_id, {
@@ -171,9 +171,9 @@ async def websocket_chat(
                     "is_typing": True
                 })
 
-                # Get agent response
+                # Get agent response (using LangGraph agent)
                 try:
-                    response = await astrology_agent.chat(
+                    response = await astrology_graph_agent.chat(
                         message=content,
                         user_profile=user_profile,
                         natal_chart=natal_chart_data,
