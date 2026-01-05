@@ -1,0 +1,61 @@
+# ============================================
+# Esoteric Astrology Chat - Python Dependencies
+# ============================================
+
+# Core Framework
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+websockets>=12.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+python-dotenv>=1.0.0
+
+# LangChain (Simple agent with tools - NOT complex LangGraph!)
+langchain>=0.1.0
+langchain-core>=0.1.0
+langchain-groq>=0.0.1
+langchain-community>=0.0.20
+langchain-openai>=0.0.5
+
+# LLM Providers (Groq primarily, Together.ai as fallback)
+groq>=0.4.0
+together>=0.2.0
+
+# Embeddings
+openai>=1.10.0  # For text-embedding-3-small
+
+# Vector Store
+chromadb>=0.4.22
+
+# Astrology (FREE - open source!)
+kerykeion>=4.0.0
+
+# HTTP Client
+httpx>=0.26.0
+aiohttp>=3.9.0
+geopy>=2.4.0  # For geocoding birth locations
+
+# Database
+SQLAlchemy>=2.0.0
+aiosqlite>=0.19.0
+
+# Authentication
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+python-multipart>=0.0.6
+
+# Utilities
+tenacity>=8.2.0          # Retry logic
+tiktoken>=0.5.0          # Token counting
+python-dateutil>=2.8.0
+pytz>=2024.1             # Timezone handling
+
+# Development
+pytest>=7.4.0
+pytest-asyncio>=0.23.0
+black>=24.0.0
+ruff>=0.1.0
+httpx-ws>=0.5.0  # For WebSocket testing
+
+# Production
+gunicorn>=21.0.0
