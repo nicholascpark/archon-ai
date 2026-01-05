@@ -57,8 +57,10 @@ async def health_check():
     }
 
 
-# Import routers (will be added in next phase)
-# from app.api.routes import auth, user, websocket
-# app.include_router(auth.router, prefix="/auth", tags=["auth"])
-# app.include_router(user.router, prefix="/api/user", tags=["user"])
-# app.include_router(websocket.router, prefix="/ws", tags=["websocket"])
+# Import routers
+from app.api.routes import auth, user, websocket
+
+# Include routers
+app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+app.include_router(user.router, prefix="/api/user", tags=["User Profile"])
+app.include_router(websocket.router, prefix="/ws", tags=["WebSocket Chat"])
