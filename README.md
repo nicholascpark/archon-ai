@@ -1,4 +1,4 @@
-# Esoteric Astrology Chat - Personal AI Astrologer
+# Archon AI - Personal AI Astrologer
 
 A subscription-based astrology chat application that acts as your personal AI astrologer, remembering your birth chart and providing personalized astrological guidance through natural conversation.
 
@@ -70,10 +70,10 @@ Key variables:
 ## Project Structure
 
 ```
-astrology-chat-agent/
+archon-ai/
 ├── app/                 # Backend application
 │   ├── api/            # FastAPI routes
-│   ├── agents/         # Simple LangChain agent
+│   ├── agents/         # LangGraph agent
 │   ├── core/           # Config, security, logging
 │   ├── models/         # Data models
 │   └── services/       # LLM, astrology, memory services

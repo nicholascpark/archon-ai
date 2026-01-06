@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables"""
 
     # Application
-    APP_NAME: str = "Astrology Chat Agent"
+    APP_NAME: str = "Archon AI"
     ENVIRONMENT: str = "development"
     DEBUG: bool = False
     SECRET_KEY: str = Field(..., min_length=32)
@@ -78,7 +78,7 @@ class Settings(BaseSettings):
 
     # Observability (Optional)
     LANGSMITH_API_KEY: Optional[str] = None
-    LANGSMITH_PROJECT: str = "astrology-chat-agent"
+    LANGSMITH_PROJECT: str = "archon-ai"
     ENABLE_TRACING: bool = False
 
     model_config = SettingsConfigDict(

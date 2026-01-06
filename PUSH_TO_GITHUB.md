@@ -21,7 +21,7 @@ Click **"Create repository"**
 After creating the repository, GitHub will show you commands. Use these:
 
 ```bash
-cd /Users/nicholaspark/astrology-chat-agent
+cd /Users/nicholaspark/Documents/archon-ai
 
 # Add GitHub remote (replace YOUR_USERNAME with your GitHub username)
 git remote add origin https://github.com/YOUR_USERNAME/archon-ai.git

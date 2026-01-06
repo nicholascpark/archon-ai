@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Entry point for the Astrology Chat application.
+Entry point for the Archon AI application.
 
 Usage:
     python run.py              # Start the server
@@ -52,7 +52,7 @@ def start_server():
 
 def main():
     """Main entry point"""
-    parser = argparse.ArgumentParser(description="Astrology Chat Application")
+    parser = argparse.ArgumentParser(description="Archon AI Application")
     parser.add_argument("--init-db", action="store_true", help="Initialize database")
     parser.add_argument("--reset-db", action="store_true", help="Reset database (deletes all data)")
     args = parser.parse_args()
