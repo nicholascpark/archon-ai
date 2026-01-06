@@ -52,7 +52,7 @@ def start_server():
 
 def main():
     """Main entry point"""
-    parser = argparse.ArgumentParser(description="Archon AI Application")
+    parser = argparse.ArgumentParser(description="Archon AI - Personal AI Astrologer")
     parser.add_argument("--init-db", action="store_true", help="Initialize database")
     parser.add_argument("--reset-db", action="store_true", help="Reset database (deletes all data)")
     args = parser.parse_args()
