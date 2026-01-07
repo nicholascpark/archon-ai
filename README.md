@@ -32,12 +32,19 @@ A subscription-based astrology chat application that acts as your personal AI as
 ### Backend Setup
 
 ```bash
+# Install UV (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
 # Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+uv venv
+
+# Activate virtual environment
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # Install dependencies
-pip install -r requirements.txt
+uv pip install -r requirements.txt
+# Or install from pyproject.toml:
+# uv pip install -e .
 
 # Set up environment
 cp .env.example .env
@@ -83,14 +90,17 @@ JWT_SECRET_KEY=your-random-secret-here-use-openssl-rand-hex-32
 SECRET_KEY=another-random-secret-here
 ```
 
-### Step 1: Install Dependencies
+### Step 1: Set Up Virtual Environment & Install Dependencies
 
 ```bash
+# Create virtual environment with UV
+uv venv
+
 # Activate virtual environment
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # Install all dependencies
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
 ### Step 2: Initialize Database
@@ -242,7 +252,7 @@ python run.py --reset-db
 **Import errors:**
 ```bash
 # Reinstall dependencies
-pip install --upgrade -r requirements.txt
+uv pip install --upgrade -r requirements.txt
 ```
 
 **API key errors:**
