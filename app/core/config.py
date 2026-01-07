@@ -2,8 +2,8 @@
 Application configuration using Pydantic Settings.
 Loads settings from environment variables with validation.
 """
-from typing import List, Optional
-from pydantic import Field, validator
+from typing import List, Optional, Union
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     # API Server
     HOST: str = "0.0.0.0"
     PORT: int = 8000
-    CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
+    CORS_ORIGINS: Union[str, List[str]] = "http://localhost:5173,http://localhost:3000"
 
     # Groq LLM (Free Tier!)
     GROQ_API_KEY: str = Field(..., description="Groq API key")
@@ -88,8 +88,9 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
-    @validator("CORS_ORIGINS", pre=True)
-    def parse_cors_origins(cls, v: str) -> List[str]:
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v) -> List[str]:
         """Parse comma-separated CORS origins into a list"""
         if isinstance(v, str):
             return [origin.strip() for origin in v.split(",")]

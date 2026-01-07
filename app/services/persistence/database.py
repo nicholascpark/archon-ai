@@ -75,30 +75,19 @@ def init_db():
     Initialize database schema.
     Creates all tables defined in models.
     """
-    from app.models.user import Base
-    from app.models.chart import Base as ChartBase
-    from app.models.conversation import Base as ConversationBase
+    # Import all models to register them with the shared Base
+    from app.models.base import Base
+    from app.models import user  # noqa: F401
+    from app.models import conversation  # noqa: F401
 
     logger.info("Initializing database schema...")
     Base.metadata.create_all(bind=engine)
-
-    # Create additional tables if needed
-    try:
-        ChartBase.metadata.create_all(bind=engine)
-    except:
-        pass  # Chart models might not exist yet
-
-    try:
-        ConversationBase.metadata.create_all(bind=engine)
-    except:
-        pass  # Conversation models might not exist yet
-
     logger.info("Database schema initialized successfully")
 
 
 def drop_db():
     """Drop all database tables (USE WITH CAUTION!)"""
-    from app.models.user import Base
+    from app.models.base import Base
 
     logger.warning("Dropping all database tables...")
     Base.metadata.drop_all(bind=engine)

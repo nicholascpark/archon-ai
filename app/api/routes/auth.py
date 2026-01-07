@@ -99,10 +99,12 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
 
     except Exception as e:
         db.rollback()
+        import traceback
         logger.error(f"Registration error: {e}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error creating user"
+            detail=f"Error creating user: {str(e)}"
         )
 
 

@@ -5,12 +5,9 @@ from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel, Field
 from sqlalchemy import Column, String, Integer, Float, DateTime, Text, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from app.models.base import Base
 import uuid
-
-
-Base = declarative_base()
 
 
 class SessionDB(Base):
@@ -24,7 +21,7 @@ class SessionDB(Base):
     message_count = Column(Integer, default=0)
     tokens_used = Column(Integer, default=0)
     cost_usd = Column(Float, default=0.0)
-    metadata = Column(Text, nullable=True)
+    extra_data = Column(Text, nullable=True)
 
 
 class MessageDB(Base):
@@ -37,7 +34,7 @@ class MessageDB(Base):
     content = Column(Text, nullable=False)
     timestamp = Column(DateTime, default=datetime.utcnow)
     tokens = Column(Integer, default=0)
-    metadata = Column(Text, nullable=True)  # JSON: chart references, aspects, etc.
+    extra_data = Column(Text, nullable=True)  # JSON: chart references, aspects, etc.
 
 
 class RelationshipDB(Base):
@@ -70,7 +67,7 @@ class CostLogDB(Base):
     input_tokens = Column(Integer, default=0)
     output_tokens = Column(Integer, default=0)
     cost_usd = Column(Float, default=0.0)
-    metadata = Column(Text, nullable=True)
+    extra_data = Column(Text, nullable=True)
 
 
 # Pydantic models

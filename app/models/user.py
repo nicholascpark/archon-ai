@@ -8,12 +8,8 @@ from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, EmailStr, Field, validator
 from sqlalchemy import Column, String, Float, DateTime, Boolean, Text
-from sqlalchemy.ext.declarative import declarative_base
+from app.models.base import Base
 import uuid
-
-
-# SQLAlchemy Base
-Base = declarative_base()
 
 
 class UserDB(Base):
@@ -57,7 +53,7 @@ class UserDB(Base):
     astrology_system = Column(String, default="western")  # western, vedic
     house_system = Column(String, default="placidus")
 
-    metadata = Column(Text, nullable=True)  # JSON for additional data
+    extra_data = Column(Text, nullable=True)  # JSON for additional data
 
 
 # Pydantic models for API validation

@@ -1,0 +1,23 @@
+graph TD
+    START([START]) --> route[Route Query Node]
+
+    route -->|Analyze user query| decision{Needs Tools?}
+
+    decision -->|Transit/Synastry Query| tools[Use Tools Node]
+    decision -->|General Question| respond[Generate Response Node]
+
+    tools -->|Call get_current_transits| tool1[Transit Tool]
+    tools -->|Call analyze_synastry| tool2[Synastry Tool]
+    tools -->|Call search_chart_memory| tool3[Memory Tool]
+
+    tool1 --> respond
+    tool2 --> respond
+    tool3 --> respond
+
+    respond --> END([END])
+
+    style START fill:#90EE90
+    style END fill:#FFB6C1
+    style decision fill:#FFE4B5
+    style tools fill:#87CEEB
+    style respond fill:#DDA0DD
