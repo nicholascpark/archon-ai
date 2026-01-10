@@ -1,0 +1,461 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* ============================================
+   Archon AI - Parchment Dark Theme
+   Esoteric, minimal, ancient manuscript feel
+   Purple accents, slightly lighter background
+   ============================================ */
+
+:root {
+  /* Core colors - Warm dark (slightly lighter) */
+  --background: #12110f;
+  --foreground: #e8e0d5;
+
+  /* Card and surface colors - Aged parchment dark */
+  --card: #1a1816;
+  --card-foreground: #e8e0d5;
+
+  /* Popover (dropdowns, tooltips) */
+  --popover: #1a1816;
+  --popover-foreground: #e8e0d5;
+
+  /* Primary accent - Mystic purple */
+  --primary: #9d7cd8;
+  --primary-foreground: #12110f;
+
+  /* Secondary - Warm sepia */
+  --secondary: #201d1a;
+  --secondary-foreground: #d4c4b0;
+
+  /* Accent - Deep violet */
+  --accent: #7c5cbf;
+  --accent-foreground: #e8e0d5;
+
+  /* Muted backgrounds - Warm earth */
+  --muted: #201d1a;
+  --muted-foreground: #8a7f72;
+
+  /* Borders and inputs - Barely visible */
+  --border: #2f2a25;
+  --input: #201d1a;
+  --ring: #9d7cd8;
+
+  /* Semantic colors */
+  --destructive: #8b0000;
+  --destructive-foreground: #e8e0d5;
+  --success: #556b2f;
+  --warning: #b8860b;
+
+  /* Zodiac element colors - Muted, aged */
+  --fire: #8b4513;
+  --earth: #556b2f;
+  --air: #4a5568;
+  --water: #2f4f4f;
+
+  /* Chart colors */
+  --chart-1: #9d7cd8;
+  --chart-2: #7c5cbf;
+  --chart-3: #8b4513;
+  --chart-4: #556b2f;
+  --chart-5: #2f4f4f;
+
+  /* Chat colors - Nearly invisible distinction */
+  --chat-user: #201d1a;
+  --chat-ai: transparent;
+
+  /* Parchment specific - Warm gold and purple accents */
+  --cream: #e8e0d5;
+  --sepia: #d4c4b0;
+  --gold: #d4a847;
+  --gold-soft: #c9a44a;
+  --amber: #b8860b;
+  --burnt: #8b4513;
+  --violet-glow: #9d7cd8;
+  --archon-gold: #e6c65c;
+
+  /* Radius - Softer, organic */
+  --radius: 0.25rem;
+}
+
+@theme inline {
+  /* Core */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  /* Custom colors */
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-fire: var(--fire);
+  --color-earth: var(--earth);
+  --color-air: var(--air);
+  --color-water: var(--water);
+  --color-chat-user: var(--chat-user);
+  --color-chat-ai: var(--chat-ai);
+  --color-cream: var(--cream);
+  --color-sepia: var(--sepia);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-amber: var(--amber);
+  --color-burnt: var(--burnt);
+  --color-violet-glow: var(--violet-glow);
+  --color-archon-gold: var(--archon-gold);
+
+  /* Charts */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Radius - More organic */
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+
+  /* Fonts */
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-serif: var(--font-crimson), Georgia, serif;
+  --font-mono: var(--font-geist-mono), monospace;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Hide scrollbar for cleaner look */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* Selection - Purple highlight */
+::selection {
+  background: var(--primary);
+  color: var(--background);
+}
+
+/* Subtle texture overlay for parchment feel */
+.parchment-texture {
+  position: relative;
+}
+
+.parchment-texture::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.02;
+  pointer-events: none;
+}
+
+/* Glow effects - Purple, subtle */
+.glow-gold {
+  box-shadow: 0 0 20px rgba(157, 124, 216, 0.15);
+}
+
+.glow-amber {
+  box-shadow: 0 0 20px rgba(124, 92, 191, 0.15);
+}
+
+/* Animation keyframes */
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes flicker {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 3s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-flicker {
+  animation: flicker 2s ease-in-out infinite;
+}
+
+.animate-typing {
+  animation: typing 1.2s ease-in-out infinite;
+}
+
+/* Chat message animations - Fade in gently */
+.message-enter {
+  animation: messageEnter 0.5s ease-out forwards;
+}
+
+@keyframes messageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Archon's message styling - Dynamic gold accents */
+.archon-message {
+  position: relative;
+  color: var(--cream);
+}
+
+.archon-message::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--gold-soft) 15%,
+    var(--archon-gold) 50%,
+    var(--gold-soft) 85%,
+    transparent 100%
+  );
+  opacity: 0.6;
+  animation: goldPulse 3s ease-in-out infinite;
+}
+
+.archon-message-glow {
+  text-shadow:
+    0 0 20px rgba(230, 198, 92, 0.08),
+    0 0 40px rgba(230, 198, 92, 0.04);
+}
+
+/* Gold shimmer effect on hover */
+.archon-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(230, 198, 92, 0.03) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 4s ease-in-out infinite;
+}
+
+@keyframes goldPulse {
+  0%, 100% {
+    opacity: 0.4;
+    height: 100%;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Archon sigil glow - enhanced gold */
+.archon-sigil {
+  color: var(--archon-gold);
+  text-shadow:
+    0 0 8px rgba(230, 198, 92, 0.5),
+    0 0 16px rgba(230, 198, 92, 0.3),
+    0 0 24px rgba(230, 198, 92, 0.15);
+  animation: sigilGlow 4s ease-in-out infinite;
+}
+
+@keyframes sigilGlow {
+  0%, 100% {
+    text-shadow:
+      0 0 8px rgba(230, 198, 92, 0.4),
+      0 0 16px rgba(230, 198, 92, 0.2);
+  }
+  50% {
+    text-shadow:
+      0 0 12px rgba(230, 198, 92, 0.6),
+      0 0 24px rgba(230, 198, 92, 0.4),
+      0 0 36px rgba(230, 198, 92, 0.2);
+  }
+}
+
+/* Streaming text cursor - Purple */
+.streaming-cursor::after {
+  content: '|';
+  color: var(--primary);
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Sigil/symbol styling */
+.sigil {
+  font-family: var(--font-serif);
+  color: var(--primary);
+  text-shadow: 0 0 10px rgba(157, 124, 216, 0.3);
+}
+
+/* Focus states - Minimal */
+*:focus-visible {
+  outline: 1px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Input placeholder - Very subtle */
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted-foreground);
+  opacity: 0.5;
+}
+
+/* ============================================
+   Celestial Glowing Dots Background
+   ============================================ */
+
+.celestial-dots {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.celestial-dot {
+  position: absolute;
+  width: var(--dot-size, 3px);
+  height: var(--dot-size, 3px);
+  border-radius: 50%;
+  background: var(--dot-color, rgba(255, 215, 100, 0.9));
+  box-shadow:
+    0 0 calc(var(--dot-size, 3px) * 1.5) calc(var(--dot-size, 3px) * 0.5) var(--dot-color, rgba(255, 215, 100, 0.6)),
+    0 0 calc(var(--dot-size, 3px) * 3) calc(var(--dot-size, 3px) * 1) var(--dot-color, rgba(255, 215, 100, 0.3)),
+    0 0 calc(var(--dot-size, 3px) * 5) calc(var(--dot-size, 3px) * 1.5) var(--dot-color, rgba(255, 215, 100, 0.1));
+  opacity: 0;
+  animation: celestialAppear var(--appear-duration, 15s) ease-in-out forwards;
+}
+
+/* Archon - the eternal star */
+.archon-star {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--archon-color, rgba(255, 255, 255, 0.95));
+  box-shadow:
+    0 0 8px 3px var(--archon-color, rgba(255, 255, 255, 0.8)),
+    0 0 15px 6px var(--archon-color, rgba(255, 255, 255, 0.5)),
+    0 0 25px 10px var(--archon-color, rgba(255, 255, 255, 0.2));
+  transition: background var(--archon-transition, 8s) ease-in-out,
+              box-shadow var(--archon-transition, 8s) ease-in-out;
+  z-index: 1;
+}
+
+/* Dots fade in slowly, exist briefly, then fade out completely */
+@keyframes celestialAppear {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  15% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  30% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  70% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  85% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
