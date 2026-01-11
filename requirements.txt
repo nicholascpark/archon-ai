@@ -53,6 +53,7 @@ email-validator>=2.0.0
 python-multipart>=0.0.6
 
 # Utilities
+itsdangerous>=2.1.0      # Required by Starlette sessions
 tenacity>=8.2.0          # Retry logic
 tiktoken>=0.5.0          # Token counting
 python-dateutil>=2.8.0
