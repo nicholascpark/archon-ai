@@ -69,3 +69,5 @@ frontend/*.tsbuildinfo
 .cache/
 tmp/
 temp/
+.playwright-mcp/
+tests/e2e/node_modules/

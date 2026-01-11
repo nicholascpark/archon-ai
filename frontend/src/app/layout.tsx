@@ -28,6 +28,10 @@ export const metadata: Metadata = {
   description: "Discover your cosmic path with AI-powered astrological insights. Get personalized readings, natal chart analysis, and daily horoscopes.",
   keywords: ["astrology", "horoscope", "natal chart", "AI", "zodiac", "birth chart"],
   authors: [{ name: "Archon AI" }],
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -48,7 +52,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <body
         className={`${inter.variable} ${crimsonPro.variable} ${geistMono.variable} font-sans antialiased`}
       >

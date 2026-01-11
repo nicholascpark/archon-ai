@@ -116,7 +116,7 @@ function SwipeModeToggle() {
         className="flex items-center gap-2 px-4 py-2 bg-card/60 backdrop-blur-md rounded-full border border-border/30 hover:border-gold/30 transition-colors"
       >
         <span className="text-sm">
-          {swipeMode === "archon" ? "&#9737;" : "&#9734;"}
+          {swipeMode === "archon" ? "☉" : "☆"}
         </span>
         <span className="font-serif text-cream/70 text-xs">
           {swipeMode === "archon" ? "archon" : "sky"}
@@ -166,7 +166,7 @@ function PlanetIndicator() {
     return (
       <div className="fixed top-6 right-6 z-50 pointer-events-none">
         <div className="flex items-center gap-2 px-3 py-1.5 bg-card/60 backdrop-blur-md rounded-full border border-border/30">
-          <span className="text-primary text-sm">&#9734;</span>
+          <span className="text-primary text-sm">☆</span>
           <span className="text-xs text-cream/60">12 constellations</span>
         </div>
       </div>
@@ -188,7 +188,7 @@ function PlanetIndicator() {
   return (
     <div className="fixed top-6 right-6 z-50 pointer-events-none">
       <div className="flex items-center gap-2 px-3 py-1.5 bg-card/60 backdrop-blur-md rounded-full border border-border/30">
-        <span className="text-gold text-sm">&#9737;</span>
+        <span className="text-gold text-sm">☉</span>
         <span className="text-xs text-cream/60">{natalPlanets.length} planets</span>
       </div>
     </div>

@@ -2,10 +2,11 @@
 Authentication routes for user registration and login.
 """
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
 
-from app.models.user import UserCreate, UserLogin, UserResponse, Token, UserDB
+from app.models.user import UserCreate, UserResponse, Token, UserDB
 from app.services.persistence.database import get_db
 from app.core.security import (
     verify_password,
@@ -109,16 +110,19 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=Token)
-async def login(credentials: UserLogin, db: Session = Depends(get_db)):
+async def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
     """
-    Login with email and password.
+    Login with email and password (OAuth2 form).
 
     Returns JWT token and user profile (including birth data).
     """
-    # Find user by email
-    user = db.query(UserDB).filter(UserDB.email == credentials.email).first()
+    # Find user by email (form_data.username is the email for OAuth2)
+    user = db.query(UserDB).filter(UserDB.email == form_data.username).first()
 
-    if not user or not verify_password(credentials.password, user.hashed_password):
+    if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",

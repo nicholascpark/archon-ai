@@ -31,13 +31,17 @@ class UserDB(Base):
     subscription_tier = Column(String, default="free")  # free, basic, premium
     is_active = Column(Boolean, default=True)
 
-    # PERMANENT BIRTH DATA (asked only once!)
-    birth_date = Column(String, nullable=False)  # ISO: 1990-05-15
+    # BIRTH DATA (collected via conversational onboarding)
+    birth_date = Column(String, nullable=True)  # ISO: 1990-05-15
     birth_time = Column(String, nullable=True)  # HH:MM:SS or null
-    birth_location = Column(String, nullable=False)  # City, Country
+    birth_location = Column(String, nullable=True)  # City, Country
     birth_latitude = Column(Float, nullable=True)
     birth_longitude = Column(Float, nullable=True)
     birth_timezone = Column(String, nullable=True)  # e.g., America/New_York
+
+    # Profile data (collected via conversation)
+    name = Column(String, nullable=True)  # Display name
+    gender = Column(String, nullable=True)  # male, female, non_binary, other
 
     # Current location (for transit timing)
     current_location = Column(String, nullable=True)
@@ -69,24 +73,24 @@ class UserCreate(UserBase):
     """
     Schema for user registration.
 
-    Includes birth data that MUST be provided during signup.
-    This is the only time we ask for birth information!
+    Simple registration - only email, username, password required.
+    Birth data is collected conversationally after registration.
     """
     password: str = Field(..., min_length=8)
 
-    # Required birth data for natal chart
-    birth_date: str = Field(..., description="Birth date in ISO format (YYYY-MM-DD)")
+    # Birth data - all optional (collected via chat agent)
+    birth_date: Optional[str] = Field(None, description="Birth date in ISO format (YYYY-MM-DD)")
     birth_time: Optional[str] = Field(None, description="Birth time in HH:MM:SS format")
-    birth_location: str = Field(..., description="Birth location (City, Country)")
-
-    # Optional advanced fields
+    birth_location: Optional[str] = Field(None, description="Birth location (City, Country)")
     birth_latitude: Optional[float] = None
     birth_longitude: Optional[float] = None
     birth_timezone: Optional[str] = None
 
     @validator("birth_date")
     def validate_birth_date(cls, v):
-        """Validate birth date format"""
+        """Validate birth date format if provided"""
+        if v is None:
+            return v
         try:
             datetime.fromisoformat(v)
             return v
@@ -99,25 +103,38 @@ class UserCreate(UserBase):
         if v is None:
             return v
         try:
-            # Validate time format HH:MM:SS
             time_parts = v.split(":")
-            if len(time_parts) != 3:
+            if len(time_parts) < 2:
                 raise ValueError("Invalid time format")
-            hours, minutes, seconds = map(int, time_parts)
+            hours, minutes = int(time_parts[0]), int(time_parts[1])
+            seconds = int(time_parts[2]) if len(time_parts) > 2 else 0
             if not (0 <= hours < 24 and 0 <= minutes < 60 and 0 <= seconds < 60):
                 raise ValueError("Invalid time values")
             return v
         except (ValueError, AttributeError):
-            raise ValueError("Birth time must be in HH:MM:SS format")
+            raise ValueError("Birth time must be in HH:MM or HH:MM:SS format")
 
 
 class UserUpdate(BaseModel):
-    """Schema for updating user profile"""
+    """Schema for updating user profile (via API or chat agent)"""
     username: Optional[str] = Field(None, min_length=3, max_length=50)
+    name: Optional[str] = Field(None, max_length=100)
+    gender: Optional[str] = Field(None, pattern="^(male|female|non_binary|other)$")
+
+    # Birth data (for conversational onboarding)
+    birth_date: Optional[str] = None
     birth_time: Optional[str] = None
+    birth_location: Optional[str] = None
+    birth_latitude: Optional[float] = None
+    birth_longitude: Optional[float] = None
+    birth_timezone: Optional[str] = None
+
+    # Current location
     current_location: Optional[str] = None
     current_latitude: Optional[float] = None
     current_longitude: Optional[float] = None
+
+    # Preferences
     astrology_system: Optional[str] = Field(None, pattern="^(western|vedic)$")
     house_system: Optional[str] = None
 
@@ -126,33 +143,43 @@ class UserResponse(UserBase):
     """
     Schema for user data in API responses.
 
-    Includes birth data that is always available in the user's profile.
+    Birth data may be incomplete for new users (collected via chat).
     """
     id: str
     created_at: datetime
     subscription_tier: str
     is_active: bool
 
-    # Birth data (always available after registration)
-    birth_date: str
-    birth_time: Optional[str]
-    birth_location: str
-    birth_latitude: Optional[float]
-    birth_longitude: Optional[float]
-    birth_timezone: Optional[str]
+    # Profile data (may be incomplete for new users)
+    name: Optional[str] = None
+    gender: Optional[str] = None
+
+    # Birth data (collected via conversational onboarding)
+    birth_date: Optional[str] = None
+    birth_time: Optional[str] = None
+    birth_location: Optional[str] = None
+    birth_latitude: Optional[float] = None
+    birth_longitude: Optional[float] = None
+    birth_timezone: Optional[str] = None
 
     # Current location
-    current_location: Optional[str]
-    current_latitude: Optional[float]
-    current_longitude: Optional[float]
-    location_updated_at: Optional[datetime]
+    current_location: Optional[str] = None
+    current_latitude: Optional[float] = None
+    current_longitude: Optional[float] = None
+    location_updated_at: Optional[datetime] = None
 
     # Natal chart status
-    natal_chart_computed_at: Optional[datetime]
+    natal_chart_computed_at: Optional[datetime] = None
 
     # Preferences
-    astrology_system: str
-    house_system: str
+    astrology_system: str = "western"
+    house_system: str = "placidus"
+
+    # Onboarding status helper
+    @property
+    def onboarding_complete(self) -> bool:
+        """Check if user has completed onboarding (has birth data for chart)"""
+        return bool(self.birth_date and self.birth_latitude and self.birth_longitude)
 
     class Config:
         from_attributes = True

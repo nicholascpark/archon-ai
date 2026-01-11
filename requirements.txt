@@ -17,6 +17,10 @@ langgraph>=0.0.40
 langchain-groq>=0.0.1
 langchain-community>=0.0.20
 langchain-openai>=0.0.5
+langchain-google-genai>=1.0.0  # For Gemini fallback
+
+# LangMem (Long-term memory SDK)
+langmem>=0.0.30
 
 # LLM Providers (Groq primarily, Together.ai as fallback)
 groq>=0.4.0
@@ -35,6 +39,7 @@ kerykeion>=4.0.0
 httpx>=0.26.0
 aiohttp>=3.9.0
 geopy>=2.4.0  # For geocoding birth locations
+timezonefinder>=6.2.0  # For timezone lookup from coordinates
 
 # Database
 SQLAlchemy>=2.0.0

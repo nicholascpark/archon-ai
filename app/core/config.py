@@ -21,18 +21,22 @@ class Settings(BaseSettings):
     PORT: int = 8000
     CORS_ORIGINS: Union[str, List[str]] = "http://localhost:5173,http://localhost:3000"
 
-    # Groq LLM (Free Tier!)
-    GROQ_API_KEY: str = Field(..., description="Groq API key")
-    GROQ_MODEL: str = "llama3-70b-8192"
-    GROQ_TEMPERATURE: float = 0.7
-    GROQ_MAX_TOKENS: int = 1024
+    # LLM Provider Selection
+    LLM_PROVIDER: str = "openai"  # openai, gemini, or groq
+    LLM_TEMPERATURE: float = 0.7
+    LLM_MAX_TOKENS: int = 1024
 
-    # Together.ai (Fallback - Optional)
-    TOGETHER_API_KEY: Optional[str] = None
-    TOGETHER_MODEL: str = "meta-llama/Llama-3-70b-chat-hf"
+    # OpenAI (Primary - best tool calling)
+    OPENAI_API_KEY: str = Field(..., description="OpenAI API key")
+    OPENAI_MODEL: str = "gpt-4.1-nano"  # or gpt-4o-mini
 
-    # OpenAI Embeddings
-    OPENAI_API_KEY: str = Field(..., description="OpenAI API key for embeddings")
+    # Google Gemini (Fallback - free tier)
+    GOOGLE_API_KEY: Optional[str] = None
+    GEMINI_MODEL: str = "gemini-2.0-flash"
+
+    # Groq (Alternative - fast & cheap)
+    GROQ_API_KEY: Optional[str] = None
+    GROQ_MODEL: str = "llama-3.3-70b-versatile"
     EMBEDDING_MODEL: str = "text-embedding-3-small"
     EMBEDDING_DIMENSIONS: int = 1536
 
@@ -75,6 +79,16 @@ class Settings(BaseSettings):
 
     # Geocoding
     GOOGLE_GEOCODING_API_KEY: Optional[str] = None
+
+    # OAuth Settings
+    GOOGLE_CLIENT_ID: Optional[str] = None
+    GOOGLE_CLIENT_SECRET: Optional[str] = None
+    META_CLIENT_ID: Optional[str] = None
+    META_CLIENT_SECRET: Optional[str] = None
+
+    # URLs for OAuth redirects
+    API_URL: str = "http://localhost:8000"
+    FRONTEND_URL: str = "http://localhost:3000"
 
     # Observability (Optional)
     LANGSMITH_API_KEY: Optional[str] = None

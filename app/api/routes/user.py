@@ -1,7 +1,7 @@
 """
 User profile routes for managing user data and natal charts.
 """
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Header
 from sqlalchemy.orm import Session
 from typing import Optional
 
@@ -17,26 +17,19 @@ router = APIRouter()
 
 
 async def get_current_user(
-    token: str = Depends(lambda: None),  # Will be extracted from headers
+    authorization: Optional[str] = Header(None),
     db: Session = Depends(get_db)
 ) -> UserDB:
     """
-    Dependency to get current authenticated user.
-
-    In production, this would extract token from Authorization header.
+    Dependency to get current authenticated user from Authorization header.
     """
-    # For now, simplified - in production use proper OAuth2 scheme
-    from fastapi import Header
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated"
+        )
 
-    async def _get_token(authorization: Optional[str] = Header(None)) -> str:
-        if not authorization or not authorization.startswith("Bearer "):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Not authenticated"
-            )
-        return authorization.replace("Bearer ", "")
-
-    token_str = await _get_token()
+    token_str = authorization.replace("Bearer ", "")
     user_id = get_user_id_from_token(token_str)
 
     if not user_id:
@@ -115,7 +108,8 @@ async def update_user_profile(
 
 @router.get("/chart")
 async def get_natal_chart(
-    current_user: UserDB = Depends(get_current_user)
+    current_user: UserDB = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     """
     Get user's natal chart data.
@@ -144,18 +138,19 @@ async def get_natal_chart(
                 timezone=current_user.birth_timezone or "UTC"
             )
 
-            # Cache it
-            from app.services.persistence.database import get_db_context
-            with get_db_context() as db:
-                current_user.natal_chart_data = json.dumps(natal_chart)
-                current_user.natal_chart_computed_at = datetime.utcnow()
+            # Cache it - re-query user in current session
+            user = db.query(UserDB).filter(UserDB.id == current_user.id).first()
+            if user:
+                user.natal_chart_data = json.dumps(natal_chart)
+                user.natal_chart_computed_at = datetime.utcnow()
                 db.commit()
+                db.refresh(user)
 
             logger.info(f"Natal chart computed for user {current_user.id}")
 
             return {
                 "chart": natal_chart,
-                "computed_at": current_user.natal_chart_computed_at
+                "computed_at": datetime.utcnow()
             }
 
         except Exception as e:

@@ -15,6 +15,93 @@ from app.models.user import UserDB
 from app.services.persistence.database import get_db_context
 from langchain_core.messages import HumanMessage, AIMessage
 
+
+async def generate_dynamic_welcome(
+    user_profile: dict,
+    natal_chart: dict,
+    needs_onboarding: bool
+) -> str:
+    """
+    Generate a dynamic, personalized welcome message using the LLM.
+
+    For returning users: Greet by name, acknowledge chart placements, mention current transits.
+    For new users: Warmly welcome and ask for their name.
+
+    Args:
+        user_profile: User's profile data
+        natal_chart: User's natal chart data (may be None)
+        needs_onboarding: Whether user needs to complete onboarding
+
+    Returns:
+        Dynamic welcome message from the agent
+    """
+    name = user_profile.get("name") or user_profile.get("username")
+
+    if needs_onboarding:
+        # New user - ask for name
+        if name:
+            opening_prompt = f"""The user {name} just connected. Welcome them back warmly.
+            They still need to complete their birth info. Ask what their birthday is.
+            Keep it to 2-3 sentences - be welcoming but concise."""
+        else:
+            opening_prompt = """A brand new user just connected to Archon.
+            Welcome them warmly and introduce yourself briefly as their astrology guide.
+            Ask for their name in a friendly way.
+            Keep it to 2-3 sentences - be welcoming but concise."""
+    else:
+        # Returning user with complete profile
+        natal_summary = astrology_graph_agent._create_natal_summary(natal_chart)
+        opening_prompt = f"""Welcome back {name or 'friend'}!
+        Their chart: {natal_summary}
+
+        Give a warm, personalized greeting acknowledging their Sun/Moon signs.
+        Mention 1-2 current transits affecting them today.
+        Keep it to 2-3 sentences - warm and insightful."""
+
+    try:
+        # Build graph and generate response
+        graph = astrology_graph_agent.build_graph(user_profile, natal_chart or {})
+
+        result = await graph.ainvoke({
+            "messages": [HumanMessage(content=opening_prompt)],
+            "user_id": user_profile.get("id", ""),
+            "user_profile": user_profile,
+            "natal_chart": natal_chart or {},
+            "next_action": "",
+            "tool_outputs": [],
+            "tokens_used": 0,
+            "cost_usd": 0.0
+        })
+
+        # Extract response
+        final_messages = result.get("messages", [])
+        if final_messages:
+            last_message = final_messages[-1]
+            if isinstance(last_message, AIMessage):
+                return last_message.content
+
+        # Fallback to static message
+        return _get_fallback_welcome(name, needs_onboarding, natal_chart)
+
+    except Exception as e:
+        logger.error(f"Error generating dynamic welcome: {e}")
+        return _get_fallback_welcome(name, needs_onboarding, natal_chart)
+
+
+def _get_fallback_welcome(name: str, needs_onboarding: bool, natal_chart: dict) -> str:
+    """Fallback static welcome message if LLM fails."""
+    if needs_onboarding:
+        if name:
+            return f"Hey {name}! Welcome to Archon. I'm your personal astrology guide. When's your birthday?"
+        else:
+            return "Welcome to Archon! I'm your personal astrology guide. What should I call you?"
+    else:
+        natal_summary = astrology_graph_agent._create_natal_summary(natal_chart) if natal_chart else ""
+        greeting = f"Welcome back, {name}!" if name else "Welcome back!"
+        if natal_summary:
+            return f"{greeting}\n\nYour chart: {natal_summary}\n\nWhat's on your mind today?"
+        return f"{greeting}\n\nWhat would you like to explore today?"
+
 router = APIRouter()
 
 
@@ -103,7 +190,7 @@ async def websocket_chat(
             await websocket.close(code=1008, reason="User not found")
             return
 
-        # Load natal chart
+        # Load natal chart (may be None for new users)
         natal_chart_data = None
         if user.natal_chart_data:
             try:
@@ -111,20 +198,24 @@ async def websocket_chat(
             except:
                 pass
 
-        if not natal_chart_data:
-            await websocket.close(code=1008, reason="Natal chart not available")
-            return
+        # Check if user needs onboarding (no birth data yet)
+        needs_onboarding = not (user.birth_date and user.birth_latitude and user.birth_longitude)
 
         # Prepare user profile dict
         user_profile = {
             "id": user.id,
             "email": user.email,
             "username": user.username,
+            "name": user.name,
+            "gender": user.gender,
             "birth_date": user.birth_date,
             "birth_time": user.birth_time,
             "birth_location": user.birth_location,
+            "birth_latitude": user.birth_latitude,
+            "birth_longitude": user.birth_longitude,
             "current_latitude": user.current_latitude,
-            "current_longitude": user.current_longitude
+            "current_longitude": user.current_longitude,
+            "needs_onboarding": needs_onboarding
         }
 
     # Accept connection
@@ -134,14 +225,18 @@ async def websocket_chat(
     if user_id not in chat_histories:
         chat_histories[user_id] = []
 
-    # Send welcome message
-    from app.agents.prompts import get_welcome_message
-    natal_summary = astrology_graph_agent._create_natal_summary(natal_chart_data)
-    welcome_msg = get_welcome_message(natal_summary)
+    # Generate and send dynamic welcome message
+    # This uses the LLM to create personalized greetings with current transits
+    welcome_msg = await generate_dynamic_welcome(
+        user_profile=user_profile,
+        natal_chart=natal_chart_data,
+        needs_onboarding=needs_onboarding
+    )
 
     await manager.send_message(user_id, {
         "type": "welcome",
-        "content": welcome_msg
+        "content": welcome_msg,
+        "needs_onboarding": needs_onboarding
     })
 
     try:
@@ -171,26 +266,113 @@ async def websocket_chat(
                     "is_typing": True
                 })
 
-                # Get agent response (using LangGraph agent)
+                # Get agent response with streaming (shows tool calls + response)
                 try:
-                    response = await astrology_graph_agent.chat(
-                        message=content,
-                        user_profile=user_profile,
-                        natal_chart=natal_chart_data,
-                        chat_history=chat_histories[user_id]
-                    )
+                    # Reload user data from database to get latest natal chart
+                    # This is necessary because update_user_profile may have computed the natal chart
+                    with get_db_context() as db:
+                        fresh_user = db.query(UserDB).filter(UserDB.id == user_id).first()
+                        if fresh_user:
+                            # Update natal chart data if it exists now
+                            if fresh_user.natal_chart_data:
+                                try:
+                                    natal_chart_data = json.loads(fresh_user.natal_chart_data)
+                                except:
+                                    pass
+                            # Update user profile with latest data
+                            user_profile = {
+                                "id": fresh_user.id,
+                                "email": fresh_user.email,
+                                "username": fresh_user.username,
+                                "name": fresh_user.name,
+                                "gender": fresh_user.gender,
+                                "birth_date": fresh_user.birth_date,
+                                "birth_time": fresh_user.birth_time,
+                                "birth_location": fresh_user.birth_location,
+                                "birth_latitude": fresh_user.birth_latitude,
+                                "birth_longitude": fresh_user.birth_longitude,
+                                "current_latitude": fresh_user.current_latitude,
+                                "current_longitude": fresh_user.current_longitude,
+                                "needs_onboarding": not (fresh_user.birth_date and fresh_user.birth_latitude and fresh_user.birth_longitude)
+                            }
 
-                    # Add assistant response to history
-                    chat_histories[user_id].append(AIMessage(content=response))
+                    # Build graph for this request
+                    graph = astrology_graph_agent.build_graph(user_profile, natal_chart_data or {})
 
-                    # Send response to client
-                    await manager.send_message(user_id, {
-                        "type": "response",
-                        "content": response,
-                        "metadata": {
-                            "timestamp": str(json.dumps({"now": True}))
-                        }
-                    })
+                    # Track streaming state
+                    full_response = ""
+                    stream_started = False
+
+                    # Stream events from the graph
+                    async for event in graph.astream_events(
+                        {
+                            "messages": chat_histories[user_id] + [HumanMessage(content=content)],
+                            "user_id": user_id,
+                            "user_profile": user_profile,
+                            "natal_chart": natal_chart_data or {},
+                            "next_action": "",
+                            "tool_outputs": [],
+                            "tokens_used": 0,
+                            "cost_usd": 0.0
+                        },
+                        version="v2"
+                    ):
+                        kind = event.get("event")
+
+                        # Tool call started - notify frontend
+                        if kind == "on_tool_start":
+                            tool_name = event.get("name", "unknown")
+                            await manager.send_message(user_id, {
+                                "type": "tool_call",
+                                "tool": tool_name,
+                                "status": "started"
+                            })
+                            logger.info(f"Tool started: {tool_name}")
+
+                        # Tool call completed
+                        elif kind == "on_tool_end":
+                            tool_name = event.get("name", "unknown")
+                            await manager.send_message(user_id, {
+                                "type": "tool_call",
+                                "tool": tool_name,
+                                "status": "completed"
+                            })
+
+                        # Streaming response chunks
+                        elif kind == "on_chat_model_stream":
+                            chunk = event.get("data", {}).get("chunk")
+                            if chunk and hasattr(chunk, 'content') and chunk.content:
+                                # Start streaming if not already
+                                if not stream_started:
+                                    await manager.send_message(user_id, {
+                                        "type": "stream_start"
+                                    })
+                                    stream_started = True
+
+                                # Send chunk
+                                await manager.send_message(user_id, {
+                                    "type": "stream_chunk",
+                                    "content": chunk.content
+                                })
+                                full_response += chunk.content
+
+                    # End streaming
+                    if stream_started:
+                        await manager.send_message(user_id, {
+                            "type": "stream_end"
+                        })
+
+                    # If no streaming occurred, send complete message
+                    if not stream_started and full_response:
+                        await manager.send_message(user_id, {
+                            "type": "message",
+                            "content": full_response
+                        })
+
+                    # Add to history if we got a response
+                    if full_response:
+                        chat_histories[user_id].append(HumanMessage(content=content))
+                        chat_histories[user_id].append(AIMessage(content=full_response))
 
                     logger.info(f"Sent response to user {user_id}")
 
