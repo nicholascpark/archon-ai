@@ -51,6 +51,7 @@ passlib[bcrypt]>=1.7.4
 bcrypt>=4.0.0,<5.0.0  # Pin to 4.x for passlib compatibility
 email-validator>=2.0.0
 python-multipart>=0.0.6
+authlib>=1.2.0        # OAuth client for Google/Meta login
 
 # Utilities
 itsdangerous>=2.1.0      # Required by Starlette sessions
