@@ -50,7 +50,7 @@ class LLMProvider:
                 self._init_groq(as_fallback=True)
 
         if self.primary_model is None:
-            raise RuntimeError("No LLM provider available. Check API keys and LLM_PROVIDER in .env")
+            logger.warning("No LLM provider available. Set API keys (OPENAI_API_KEY, GOOGLE_API_KEY, or GROQ_API_KEY) to enable AI features.")
 
     def _init_openai(self, as_fallback=False):
         try:
@@ -110,14 +110,21 @@ class LLMProvider:
             logger.warning(f"Failed to initialize Groq: {e}")
 
     @property
-    def model(self) -> BaseChatModel:
+    def model(self) -> Optional[BaseChatModel]:
         """Get the primary model for direct use."""
         return self.primary_model
+
+    @property
+    def is_available(self) -> bool:
+        """Check if any LLM provider is available."""
+        return self.primary_model is not None
 
     def invoke(self, messages: List[BaseMessage], **kwargs) -> Any:
         """
         Invoke the LLM with automatic fallback on error.
         """
+        if not self.is_available:
+            raise RuntimeError("No LLM provider configured. Set API keys in environment variables.")
         try:
             return self.primary_model.invoke(messages, **kwargs)
         except Exception as e:
@@ -131,6 +138,8 @@ class LLMProvider:
         """
         Async invoke with fallback.
         """
+        if not self.is_available:
+            raise RuntimeError("No LLM provider configured. Set API keys in environment variables.")
         try:
             return await self.primary_model.ainvoke(messages, **kwargs)
         except Exception as e:
@@ -140,16 +149,20 @@ class LLMProvider:
                 return await self.fallback_model.ainvoke(messages, **kwargs)
             raise
 
-    def bind_tools(self, tools: List[Any]) -> BaseChatModel:
+    def bind_tools(self, tools: List[Any]) -> Optional[BaseChatModel]:
         """
         Bind tools to the primary model.
         """
+        if not self.is_available:
+            return None
         return self.primary_model.bind_tools(tools)
 
     def with_fallback(self, tools: Optional[List[Any]] = None):
         """
         Get model with fallback chain for tool calling.
         """
+        if not self.is_available:
+            return None
         if tools:
             primary = self.primary_model.bind_tools(tools)
             if self.fallback_model:
