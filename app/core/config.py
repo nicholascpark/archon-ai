@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "Archon AI"
     ENVIRONMENT: str = "development"
     DEBUG: bool = False
-    SECRET_KEY: str = Field(..., min_length=32)
+    SECRET_KEY: str = Field(default="change-me-in-production-min-32-chars!", min_length=32)
 
     # API Server
     HOST: str = "0.0.0.0"
@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     LLM_MAX_TOKENS: int = 1024
 
     # OpenAI (Primary - best tool calling)
-    OPENAI_API_KEY: str = Field(..., description="OpenAI API key")
+    OPENAI_API_KEY: Optional[str] = Field(default=None, description="OpenAI API key")
     OPENAI_MODEL: str = "gpt-4.1-nano"  # or gpt-4o-mini
 
     # Google Gemini (Fallback - free tier)
@@ -50,7 +50,7 @@ class Settings(BaseSettings):
     ASTROLOGY_SYSTEM: str = "western"
 
     # JWT Authentication
-    JWT_SECRET_KEY: str = Field(..., min_length=32)
+    JWT_SECRET_KEY: str = Field(default="change-me-jwt-secret-min-32-chars!", min_length=32)
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRATION_HOURS: int = 24
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
