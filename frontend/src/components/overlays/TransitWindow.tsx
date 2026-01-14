@@ -122,14 +122,12 @@ function TransitCard({
     <div
       className={cn(
         "rounded-xl overflow-hidden transition-all duration-500",
-        "cursor-pointer hover:scale-[1.02]",
-        isExpanded ? "ring-2" : ""
+        "cursor-pointer hover:scale-[1.02]"
       )}
       style={{
         background: `linear-gradient(135deg, rgba(${hexToRgb(aspect.color)}, 0.15) 0%, rgba(10, 10, 20, 0.9) 100%)`,
         border: `1px solid ${aspect.color}40`,
-        boxShadow: isExpanded ? `0 0 30px ${aspect.color}30` : "none",
-        ringColor: aspect.color,
+        boxShadow: isExpanded ? `0 0 30px ${aspect.color}30, 0 0 0 2px ${aspect.color}` : "none",
         animationDelay: `${index * 100}ms`,
       }}
       onClick={onToggle}
