@@ -106,6 +106,11 @@ export interface SphereState {
 
   // Quality setting for performance
   quality: "low" | "medium" | "high";
+
+  // Zoom state
+  zoomLevel: number;
+  isTransitView: boolean;
+  transitWindowOpen: boolean;
 }
 
 // Sphere store actions
@@ -122,6 +127,11 @@ export interface SphereActions {
   setOverlayVisible: (visible: boolean) => void;
   setHoveredConstellation: (name: string | null) => void;
   setQuality: (quality: "low" | "medium" | "high") => void;
+  // Zoom actions
+  setZoomLevel: (zoom: number) => void;
+  zoomIn: () => void;
+  zoomOut: () => void;
+  setTransitWindowOpen: (open: boolean) => void;
   reset: () => void;
 }
 

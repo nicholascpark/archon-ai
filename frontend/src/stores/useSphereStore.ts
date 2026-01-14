@@ -13,6 +13,11 @@ import type {
 const FRICTION = 0.95;
 const MIN_VELOCITY = 0.001;
 
+// Zoom settings
+const MIN_ZOOM = 0.3;  // Max zoomed out (transit view)
+const MAX_ZOOM = 1.5;  // Max zoomed in
+const DEFAULT_ZOOM = 1.0;
+
 // Initial state
 const initialState = {
   activeQuadrant: "chat" as QuadrantType,
@@ -27,6 +32,10 @@ const initialState = {
   showModeShiftPulse: false,
   hoveredConstellation: null as string | null,
   quality: "high" as const,
+  // Zoom state
+  zoomLevel: DEFAULT_ZOOM,
+  isTransitView: false,
+  transitWindowOpen: false,
 };
 
 export const useSphereStore = create<SphereStore>((set, get) => ({
@@ -131,6 +140,31 @@ export const useSphereStore = create<SphereStore>((set, get) => ({
 
   setQuality: (quality: "low" | "medium" | "high") => {
     set({ quality });
+  },
+
+  // Zoom functions
+  setZoomLevel: (zoom: number) => {
+    const clampedZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom));
+    const isTransitView = clampedZoom <= MIN_ZOOM + 0.1;
+    set({ zoomLevel: clampedZoom, isTransitView });
+  },
+
+  zoomIn: () => {
+    const { zoomLevel } = get();
+    const newZoom = Math.min(MAX_ZOOM, zoomLevel + 0.1);
+    const isTransitView = newZoom <= MIN_ZOOM + 0.1;
+    set({ zoomLevel: newZoom, isTransitView });
+  },
+
+  zoomOut: () => {
+    const { zoomLevel } = get();
+    const newZoom = Math.max(MIN_ZOOM, zoomLevel - 0.1);
+    const isTransitView = newZoom <= MIN_ZOOM + 0.1;
+    set({ zoomLevel: newZoom, isTransitView });
+  },
+
+  setTransitWindowOpen: (open: boolean) => {
+    set({ transitWindowOpen: open });
   },
 
   reset: () => {

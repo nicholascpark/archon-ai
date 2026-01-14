@@ -32,25 +32,71 @@ const Constellations = dynamic(
   { ssr: false }
 );
 
-const ChatOverlay = dynamic(
-  () => import("@/components/overlays/ChatOverlay").then((mod) => mod.ChatOverlay),
+// Enhanced space-themed overlays
+const EnhancedChatOverlay = dynamic(
+  () => import("@/components/overlays/SpaceThemedOverlay").then((mod) => mod.EnhancedChatOverlay),
   { ssr: false }
 );
 
-const MemoryOverlay = dynamic(
-  () => import("@/components/overlays/ChatOverlay").then((mod) => mod.MemoryOverlay),
+const EnhancedMemoryOverlay = dynamic(
+  () => import("@/components/overlays/SpaceThemedOverlay").then((mod) => mod.EnhancedMemoryOverlay),
   { ssr: false }
 );
 
-const ChartOverlay = dynamic(
-  () => import("@/components/overlays/ChatOverlay").then((mod) => mod.ChartOverlay),
+const EnhancedChartOverlay = dynamic(
+  () => import("@/components/overlays/SpaceThemedOverlay").then((mod) => mod.EnhancedChartOverlay),
   { ssr: false }
 );
 
-const SocialOverlay = dynamic(
-  () => import("@/components/overlays/ChatOverlay").then((mod) => mod.SocialOverlay),
+const EnhancedSocialOverlay = dynamic(
+  () => import("@/components/overlays/SpaceThemedOverlay").then((mod) => mod.EnhancedSocialOverlay),
   { ssr: false }
 );
+
+// Transit window and zoom controls
+const TransitWindow = dynamic(
+  () => import("@/components/overlays/TransitWindow").then((mod) => mod.TransitWindow),
+  { ssr: false }
+);
+
+const ZoomControls = dynamic(
+  () => import("@/components/overlays/TransitWindow").then((mod) => mod.ZoomControls),
+  { ssr: false }
+);
+
+// New romantic swipe UI components
+const SwipeGestureIndicators = dynamic(
+  () => import("@/components/sphere/SwipeGestureIndicators").then((mod) => mod.SwipeGestureIndicators),
+  { ssr: false }
+);
+
+const SwipeTrailEffect = dynamic(
+  () => import("@/components/sphere/SwipeTrailEffect").then((mod) => mod.SwipeTrailEffect),
+  { ssr: false }
+);
+
+const AmbientSparkles = dynamic(
+  () => import("@/components/sphere/SwipeTrailEffect").then((mod) => mod.AmbientSparkles),
+  { ssr: false }
+);
+
+const RomanticAmbientEffects = dynamic(
+  () => import("@/components/sphere/RomanticAmbientEffects").then((mod) => mod.RomanticAmbientEffects),
+  { ssr: false }
+);
+
+// Cosmic zoom effect - magical dust streaming toward user
+const CosmicZoomEffect = dynamic(
+  () => import("@/components/sphere/CosmicZoomEffect").then((mod) => mod.CosmicZoomEffect),
+  { ssr: false }
+);
+
+// Enhanced UI components
+import {
+  EnhancedQuadrantIndicator,
+  SwipeProgressBar,
+  SwipeInstructionHint,
+} from "@/components/ui/EnhancedQuadrantIndicator";
 
 // Loading screen
 function LoadingScreen() {
@@ -236,21 +282,44 @@ export default function SphereHome() {
         {/* Constellations layer (visible in sky mode, subtle in archon mode) */}
         <Constellations radius={7} />
 
+        {/* Romantic ambient effects (shooting stars, floating particles) */}
+        <RomanticAmbientEffects />
+
+        {/* Cosmic zoom effect - magical dust streaming geometrically toward viewer */}
+        <CosmicZoomEffect />
+
+        {/* Ambient sparkles around sphere */}
+        <AmbientSparkles count={30} />
+
+        {/* Swipe trail effect (particles during drag) */}
+        <SwipeTrailEffect />
+
+        {/* Swipe gesture direction indicators */}
+        <SwipeGestureIndicators />
+
         {/* Navigation sphere */}
         <QuadrantSphere onQuadrantChange={handleQuadrantChange} />
 
-        {/* Overlays rendered inside canvas for proper z-ordering */}
-        <ChatOverlay />
-        <MemoryOverlay />
-        <ChartOverlay />
-        <SocialOverlay />
+        {/* Enhanced space-themed overlays rendered inside canvas */}
+        <EnhancedChatOverlay />
+        <EnhancedMemoryOverlay />
+        <EnhancedChartOverlay />
+        <EnhancedSocialOverlay />
+
+        {/* Transit window (appears when zoomed out) */}
+        <TransitWindow />
       </SphereCanvas>
 
       {/* UI overlays outside canvas */}
-      <QuadrantIndicator />
+      <EnhancedQuadrantIndicator />
+      <SwipeProgressBar />
+      <SwipeInstructionHint />
       <InstructionsOverlay />
       <PlanetIndicator />
       <SwipeModeToggle />
+
+      {/* Zoom controls (left side) */}
+      <ZoomControls />
     </>
   );
 }

@@ -459,3 +459,337 @@ textarea::placeholder {
     transform: scale(0.6);
   }
 }
+
+/* ============================================
+   Romantic Swipe UI Animations
+   ============================================ */
+
+/* Sparkle rising animation */
+@keyframes sparkle-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(-5px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-25px) scale(0.5);
+  }
+}
+
+.animate-sparkle-rise {
+  animation: sparkle-rise 1s ease-out forwards;
+}
+
+/* Indicator enter animation */
+@keyframes indicator-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-indicator-enter {
+  animation: indicator-enter 0.4s ease-out forwards;
+}
+
+/* Icon pulse animation */
+@keyframes icon-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+.animate-icon-pulse {
+  animation: icon-pulse 0.5s ease-out;
+}
+
+/* Pulse ring animation */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 0.6s ease-out forwards;
+}
+
+/* Fade in animation */
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+/* Swipe hint left animation */
+@keyframes swipe-hint {
+  0%, 100% {
+    transform: translateX(0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateX(-5px);
+    opacity: 0.7;
+  }
+}
+
+.animate-swipe-hint {
+  animation: swipe-hint 1.5s ease-in-out infinite;
+}
+
+/* Swipe hint right animation */
+@keyframes swipe-hint-reverse {
+  0%, 100% {
+    transform: translateX(0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateX(5px);
+    opacity: 0.7;
+  }
+}
+
+.animate-swipe-hint-reverse {
+  animation: swipe-hint-reverse 1.5s ease-in-out infinite;
+}
+
+/* Romantic glow effect */
+@keyframes romantic-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(201, 160, 160, 0.2),
+                0 0 40px rgba(157, 124, 216, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(201, 160, 160, 0.4),
+                0 0 60px rgba(157, 124, 216, 0.2);
+  }
+}
+
+.animate-romantic-glow {
+  animation: romantic-glow 3s ease-in-out infinite;
+}
+
+/* Heart pulse animation */
+@keyframes heart-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.1);
+  }
+  50% {
+    transform: scale(1);
+  }
+  75% {
+    transform: scale(1.1);
+  }
+}
+
+.animate-heart-pulse {
+  animation: heart-pulse 1s ease-in-out infinite;
+}
+
+/* Shooting star animation */
+@keyframes shooting-star {
+  0% {
+    transform: translateX(0) translateY(0) rotate(-45deg);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(300px) translateY(300px) rotate(-45deg);
+    opacity: 0;
+  }
+}
+
+.animate-shooting-star {
+  animation: shooting-star 1s ease-out forwards;
+}
+
+/* Celestial orbit animation */
+@keyframes celestial-orbit {
+  0% {
+    transform: rotate(0deg) translateX(50px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(50px) rotate(-360deg);
+  }
+}
+
+.animate-celestial-orbit {
+  animation: celestial-orbit 20s linear infinite;
+}
+
+/* Scale bounce for compatibility reveal */
+@keyframes scale-bounce {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-scale-bounce {
+  animation: scale-bounce 0.5s ease-out forwards;
+}
+
+/* ============================================
+   Space-themed Overlay Animations
+   ============================================ */
+
+/* Scan line effect for space windows */
+@keyframes scan-line {
+  0% {
+    top: 0%;
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+.animate-scan-line {
+  animation: scan-line 3s ease-in-out infinite;
+}
+
+/* Gold text shimmer */
+@keyframes gold-shimmer {
+  0% {
+    text-shadow: 0 0 10px rgba(212, 168, 71, 0.5), 0 0 20px rgba(212, 168, 71, 0.3);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(212, 168, 71, 0.8), 0 0 40px rgba(212, 168, 71, 0.5), 0 0 60px rgba(212, 168, 71, 0.3);
+  }
+  100% {
+    text-shadow: 0 0 10px rgba(212, 168, 71, 0.5), 0 0 20px rgba(212, 168, 71, 0.3);
+  }
+}
+
+.animate-gold-shimmer {
+  animation: gold-shimmer 2s ease-in-out infinite;
+}
+
+/* Window slide up */
+@keyframes slide-up-fade {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up-fade 0.5s ease-out forwards;
+}
+
+/* Corner glow pulse */
+@keyframes corner-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px currentColor;
+  }
+  50% {
+    box-shadow: 0 0 20px currentColor, 0 0 30px currentColor;
+  }
+}
+
+.animate-corner-glow {
+  animation: corner-glow 2s ease-in-out infinite;
+}
+
+/* Transit card entrance */
+@keyframes transit-card-enter {
+  0% {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-transit-card {
+  animation: transit-card-enter 0.4s ease-out forwards;
+}
+
+/* Cosmic pulse for transit view */
+@keyframes cosmic-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+.animate-cosmic-pulse {
+  animation: cosmic-pulse 3s ease-in-out infinite;
+}
+
+/* Zodiac wheel rotation */
+@keyframes zodiac-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-zodiac-rotate {
+  animation: zodiac-rotate 120s linear infinite;
+}
+
+/* Aspect line pulse */
+@keyframes aspect-line-pulse {
+  0%, 100% {
+    stroke-opacity: 0.3;
+  }
+  50% {
+    stroke-opacity: 0.7;
+  }
+}
+
+.animate-aspect-line {
+  animation: aspect-line-pulse 2s ease-in-out infinite;
+}
