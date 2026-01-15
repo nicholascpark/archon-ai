@@ -38,6 +38,11 @@ async def startup_event():
     logger.info(f"Starting {settings.APP_NAME}")
     logger.info(f"Environment: {settings.ENVIRONMENT}")
 
+    # Initialize database tables
+    from app.services.persistence.database import init_db
+    init_db()
+    logger.info("Database initialized")
+
 
 @app.on_event("shutdown")
 async def shutdown_event():
