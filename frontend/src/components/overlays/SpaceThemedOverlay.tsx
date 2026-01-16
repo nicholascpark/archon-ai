@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, ReactNode } from "react";
-import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { useSphereStore } from "@/stores/useSphereStore";
 
@@ -136,11 +135,6 @@ interface SpaceWindowProps {
 export function SpaceWindow({ children, quadrant, isOpen, onClose, className }: SpaceWindowProps) {
   const theme = OVERLAY_THEMES[quadrant];
   const [showContent, setShowContent] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -152,10 +146,7 @@ export function SpaceWindow({ children, quadrant, isOpen, onClose, className }: 
     }
   }, [isOpen]);
 
-  // Don't render on server
-  if (!mounted) return null;
-
-  const content = (
+  return (
     <div
       className={cn(
         "fixed inset-0 flex items-center justify-center p-4 z-[100]",
@@ -269,9 +260,6 @@ export function SpaceWindow({ children, quadrant, isOpen, onClose, className }: 
       </div>
     </div>
   );
-
-  // Use portal to render outside Canvas at document body level
-  return createPortal(content, document.body);
 }
 
 // Chat quadrant content
