@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef, ReactNode } from "react";
-import { Html } from "@react-three/drei";
+import { useEffect, useState, ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { useSphereStore } from "@/stores/useSphereStore";
 
@@ -136,6 +136,11 @@ interface SpaceWindowProps {
 export function SpaceWindow({ children, quadrant, isOpen, onClose, className }: SpaceWindowProps) {
   const theme = OVERLAY_THEMES[quadrant];
   const [showContent, setShowContent] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -147,122 +152,126 @@ export function SpaceWindow({ children, quadrant, isOpen, onClose, className }: 
     }
   }, [isOpen]);
 
-  return (
-    <Html center fullscreen style={{ pointerEvents: isOpen ? "auto" : "none" }}>
+  // Don't render on server
+  if (!mounted) return null;
+
+  const content = (
+    <div
+      className={cn(
+        "fixed inset-0 flex items-center justify-center p-4 z-[100]",
+        "transition-all duration-500 ease-out",
+        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+      )}
+    >
+      {/* Backdrop with cosmic blur */}
       <div
         className={cn(
-          "fixed inset-0 flex items-center justify-center",
-          "transition-all duration-500 ease-out",
-          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          "absolute inset-0 backdrop-blur-md",
+          "transition-opacity duration-500",
+          isOpen ? "opacity-100" : "opacity-0"
         )}
+        style={{
+          background: `radial-gradient(ellipse at center, ${theme.glow} 0%, rgba(10, 10, 20, 0.85) 70%)`,
+        }}
+        onClick={onClose}
+      />
+
+      {/* Main window */}
+      <div
+        className={cn(
+          "relative w-full max-w-2xl mx-4",
+          "h-[60vh] max-h-[500px]",
+          "rounded-2xl overflow-hidden",
+          "transform transition-all duration-700 ease-out",
+          isOpen ? "scale-100 translate-y-0" : "scale-90 translate-y-8",
+          className
+        )}
+        style={{
+          background: `linear-gradient(135deg, rgba(20, 20, 35, 0.95) 0%, rgba(10, 10, 20, 0.98) 100%)`,
+          border: `1px solid ${theme.border}`,
+          boxShadow: `
+            0 0 40px ${theme.glow},
+            inset 0 0 60px rgba(0, 0, 0, 0.5),
+            0 25px 50px -12px rgba(0, 0, 0, 0.8)
+          `,
+        }}
       >
-        {/* Backdrop with cosmic blur */}
-        <div
-          className={cn(
-            "absolute inset-0 backdrop-blur-md",
-            "transition-opacity duration-500",
-            isOpen ? "opacity-100" : "opacity-0"
-          )}
-          style={{
-            background: `radial-gradient(ellipse at center, ${theme.glow} 0%, rgba(10, 10, 20, 0.85) 70%)`,
-          }}
-          onClick={onClose}
-        />
+        {/* Animated particles */}
+        <OverlayParticles color={theme.accent} />
 
-        {/* Main window */}
+        {/* Glowing border */}
+        <GlowingBorder color={theme.accent} active={isOpen} />
+
+        {/* Window header */}
         <div
-          className={cn(
-            "relative w-full max-w-2xl mx-4",
-            "h-[85vh] max-h-[700px]",
-            "rounded-2xl overflow-hidden",
-            "transform transition-all duration-700 ease-out",
-            isOpen ? "scale-100 translate-y-0" : "scale-90 translate-y-8",
-            className
-          )}
-          style={{
-            background: `linear-gradient(135deg, rgba(20, 20, 35, 0.95) 0%, rgba(10, 10, 20, 0.98) 100%)`,
-            border: `1px solid ${theme.border}`,
-            boxShadow: `
-              0 0 40px ${theme.glow},
-              inset 0 0 60px rgba(0, 0, 0, 0.5),
-              0 25px 50px -12px rgba(0, 0, 0, 0.8)
-            `,
-          }}
+          className="relative z-10 flex items-center justify-between px-6 py-4 border-b"
+          style={{ borderColor: theme.border }}
         >
-          {/* Animated particles */}
-          <OverlayParticles color={theme.accent} />
-
-          {/* Glowing border */}
-          <GlowingBorder color={theme.accent} active={isOpen} />
-
-          {/* Window header */}
-          <div
-            className="relative z-10 flex items-center justify-between px-6 py-4 border-b"
-            style={{ borderColor: theme.border }}
-          >
-            <div className="flex items-center gap-3">
-              {/* Animated icon */}
-              <span
-                className={cn(
-                  "text-2xl transition-all duration-500",
-                  showContent ? "opacity-100 scale-100" : "opacity-0 scale-50"
-                )}
-                style={{
-                  color: theme.accent,
-                  textShadow: `0 0 20px ${theme.accent}, 0 0 40px ${theme.accent}40`,
-                  filter: `drop-shadow(0 0 10px ${theme.accent})`,
-                }}
-              >
-                {theme.icon}
-              </span>
-
-              <div
-                className={cn(
-                  "transition-all duration-500 delay-100",
-                  showContent ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
-                )}
-              >
-                <h2
-                  className="font-serif text-lg tracking-wide"
-                  style={{ color: theme.accent }}
-                >
-                  {theme.title}
-                </h2>
-                <p className="text-xs text-cream/40 font-light tracking-wider">
-                  {theme.subtitle}
-                </p>
-              </div>
-            </div>
-
-            {/* Close button */}
-            <button
-              onClick={onClose}
+          <div className="flex items-center gap-3">
+            {/* Animated icon */}
+            <span
               className={cn(
-                "w-8 h-8 flex items-center justify-center rounded-full",
-                "transition-all duration-300",
-                "hover:bg-white/10"
+                "text-2xl transition-all duration-500",
+                showContent ? "opacity-100 scale-100" : "opacity-0 scale-50"
               )}
-              style={{ color: theme.accent }}
+              style={{
+                color: theme.accent,
+                textShadow: `0 0 20px ${theme.accent}, 0 0 40px ${theme.accent}40`,
+                filter: `drop-shadow(0 0 10px ${theme.accent})`,
+              }}
             >
-              <span className="text-xl">×</span>
-            </button>
+              {theme.icon}
+            </span>
+
+            <div
+              className={cn(
+                "transition-all duration-500 delay-100",
+                showContent ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
+              )}
+            >
+              <h2
+                className="font-serif text-lg tracking-wide"
+                style={{ color: theme.accent }}
+              >
+                {theme.title}
+              </h2>
+              <p className="text-xs text-cream/40 font-light tracking-wider">
+                {theme.subtitle}
+              </p>
+            </div>
           </div>
 
-          {/* Content area */}
-          <div
+          {/* Close button */}
+          <button
+            onClick={onClose}
             className={cn(
-              "relative z-10 flex-1 overflow-y-auto p-6",
-              "transition-all duration-700 delay-200",
-              showContent ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              "w-8 h-8 flex items-center justify-center rounded-full",
+              "transition-all duration-300",
+              "hover:bg-white/10"
             )}
-            style={{ height: "calc(100% - 70px)" }}
+            style={{ color: theme.accent }}
           >
-            {children}
-          </div>
+            <span className="text-xl">×</span>
+          </button>
+        </div>
+
+        {/* Content area */}
+        <div
+          className={cn(
+            "relative z-10 flex-1 overflow-y-auto p-6",
+            "transition-all duration-700 delay-200",
+            showContent ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          )}
+          style={{ height: "calc(100% - 70px)" }}
+        >
+          {children}
         </div>
       </div>
-    </Html>
+    </div>
   );
+
+  // Use portal to render outside Canvas at document body level
+  return createPortal(content, document.body);
 }
 
 // Chat quadrant content

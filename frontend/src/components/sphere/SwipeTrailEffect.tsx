@@ -154,8 +154,8 @@ export function SwipeTrailEffect() {
   );
 }
 
-// Ambient floating sparkles
-export function AmbientSparkles({ count = 20 }: { count?: number }) {
+// Ambient floating sparkles - minimized for cleaner visibility
+export function AmbientSparkles({ count = 8 }: { count?: number }) {
   const sparklesRef = useRef<THREE.Points>(null);
 
   const positions = useMemo(() => {
@@ -163,7 +163,7 @@ export function AmbientSparkles({ count = 20 }: { count?: number }) {
     for (let i = 0; i < count; i++) {
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.random() * Math.PI;
-      const radius = 2.5 + Math.random() * 1.5;
+      const radius = 3 + Math.random() * 2; // Further from center
 
       pos.push(
         radius * Math.sin(phi) * Math.cos(theta),
@@ -177,9 +177,9 @@ export function AmbientSparkles({ count = 20 }: { count?: number }) {
   useFrame(({ clock }) => {
     if (!sparklesRef.current) return;
     const time = clock.getElapsedTime();
-    sparklesRef.current.rotation.y = time * 0.05;
+    sparklesRef.current.rotation.y = time * 0.03;
     const material = sparklesRef.current.material as THREE.PointsMaterial;
-    material.opacity = 0.4 + Math.sin(time * 2) * 0.2;
+    material.opacity = 0.15 + Math.sin(time * 2) * 0.05;
   });
 
   return (
@@ -191,10 +191,10 @@ export function AmbientSparkles({ count = 20 }: { count?: number }) {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.04}
+        size={0.02}
         color="#e6c65c"
         transparent
-        opacity={0.5}
+        opacity={0.2}
         blending={THREE.AdditiveBlending}
         sizeAttenuation
         depthWrite={false}

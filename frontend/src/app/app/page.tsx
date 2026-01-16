@@ -288,8 +288,8 @@ export default function SphereHome() {
         {/* Cosmic zoom effect - magical dust streaming geometrically toward viewer */}
         <CosmicZoomEffect />
 
-        {/* Ambient sparkles around sphere */}
-        <AmbientSparkles count={30} />
+        {/* Ambient sparkles around sphere - reduced for cleaner view */}
+        <AmbientSparkles count={10} />
 
         {/* Swipe trail effect (particles during drag) */}
         <SwipeTrailEffect />
@@ -300,15 +300,15 @@ export default function SphereHome() {
         {/* Navigation sphere */}
         <QuadrantSphere onQuadrantChange={handleQuadrantChange} />
 
-        {/* Enhanced space-themed overlays rendered inside canvas */}
-        <EnhancedChatOverlay />
-        <EnhancedMemoryOverlay />
-        <EnhancedChartOverlay />
-        <EnhancedSocialOverlay />
-
         {/* Transit window (appears when zoomed out) */}
         <TransitWindow />
       </SphereCanvas>
+
+      {/* Enhanced space-themed overlays - rendered via portal to document.body */}
+      <EnhancedChatOverlay />
+      <EnhancedMemoryOverlay />
+      <EnhancedChartOverlay />
+      <EnhancedSocialOverlay />
 
       {/* UI overlays outside canvas */}
       <EnhancedQuadrantIndicator />

@@ -132,10 +132,10 @@ function CelestialDust({ count = 100 }: { count?: number }) {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.02}
+        size={0.015}
         color={ROMANTIC_COLORS.cream}
         transparent
-        opacity={0.3}
+        opacity={0.08}
         blending={THREE.AdditiveBlending}
         sizeAttenuation
         depthWrite={false}
@@ -163,7 +163,8 @@ export function RomanticAmbientEffects() {
     setShootingStars((prev) => prev.filter((s) => s !== id));
   }, []);
 
-  const dustCount = quality === "high" ? 100 : quality === "medium" ? 50 : 25;
+  // Drastically reduced dust for cleaner visibility
+  const dustCount = quality === "high" ? 8 : quality === "medium" ? 5 : 3;
 
   return (
     <group>

@@ -527,14 +527,14 @@ export function CosmicZoomEffect() {
 
   return (
     <group>
-      {/* Background constellation web */}
+      {/* Background constellation web - keep for subtle ambiance */}
       <ConstellationWeb active={zoomActive} />
 
-      {/* Symbolic universe layer */}
-      <SymbolicUniverseLayer active={zoomActive} />
+      {/* Symbolic universe layer - disabled to reduce visual clutter */}
+      {/* <SymbolicUniverseLayer active={zoomActive} /> */}
 
-      {/* Main zooming dust field */}
-      <ZoomingDustField intensity={effectIntensity} active={zoomActive} />
+      {/* Main zooming dust field - disabled to reduce visual clutter */}
+      {/* <ZoomingDustField intensity={effectIntensity} active={zoomActive} /> */}
 
       {/* Location anchor */}
       {location && (
