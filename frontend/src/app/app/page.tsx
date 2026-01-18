@@ -6,7 +6,7 @@ import { useSphereStore } from "@/stores/useSphereStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useAstrologyStore } from "@/stores/useAstrologyStore";
 import { useWebSocket } from "@/hooks/useWebSocket";
-import { usePlanetaryData, useDemoPlanetaryData } from "@/hooks/usePlanetaryData";
+import { usePlanetaryData, useDemoPlanetaryData, useTransitData } from "@/hooks/usePlanetaryData";
 
 // Dynamic import to prevent SSR issues with Three.js
 const SphereCanvas = dynamic(
@@ -62,6 +62,12 @@ const ZoomControls = dynamic(
 // 3D floating transit labels (replaces popup TransitWindow)
 const TransitLabels3D = dynamic(
   () => import("@/components/sphere/TransitLabels3D").then((mod) => mod.TransitLabels3D),
+  { ssr: false }
+);
+
+// Zodiac wheel chart (appears when zoomed out)
+const ZodiacWheelChart = dynamic(
+  () => import("@/components/sphere/ZodiacWheelChart").then((mod) => mod.ZodiacWheelChart),
   { ssr: false }
 );
 
@@ -245,6 +251,7 @@ function PlanetIndicator() {
 export default function SphereHome() {
   const { token, user } = useAuthStore();
   const natalPlanets = useAstrologyStore((s) => s.natalPlanets);
+  const transitPlanets = useAstrologyStore((s) => s.transitPlanets);
   const swipeMode = useSphereStore((s) => s.swipeMode);
 
   // Initialize WebSocket connection for chat
@@ -253,16 +260,61 @@ export default function SphereHome() {
   // Fetch planetary data from backend
   const { fetchNatalChart, hasChart } = usePlanetaryData();
 
-  // Use demo data if no chart available after a short delay
+  // Fetch transit data (real-time planetary positions)
+  useTransitData();
+
+  // Load demo data if no chart/transits available after a short delay
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!hasChart && natalPlanets.length === 0) {
         // Load demo data for visualization
-        import("@/hooks/usePlanetaryData").then(({ useDemoPlanetaryData }) => {
-          // We'll use the demo data directly
+        const { setNatalChart, updateTransits } = useAstrologyStore.getState();
+
+        // Demo natal chart
+        const demoChart = {
+          birthDate: "1990-06-15",
+          birthTime: "14:30:00",
+          latitude: 40.7128,
+          longitude: -74.006,
+          timezone: "America/New_York",
+          planets: {
+            sun: { name: "Sun", sign: "Gemini", degree: 24.5, absoluteDegree: 84.5, house: 10, isRetrograde: false },
+            moon: { name: "Moon", sign: "Scorpio", degree: 12.3, absoluteDegree: 222.3, house: 2, isRetrograde: false },
+            mercury: { name: "Mercury", sign: "Cancer", degree: 5.7, absoluteDegree: 95.7, house: 10, isRetrograde: false },
+            venus: { name: "Venus", sign: "Taurus", degree: 28.2, absoluteDegree: 58.2, house: 9, isRetrograde: false },
+            mars: { name: "Mars", sign: "Aries", degree: 15.8, absoluteDegree: 15.8, house: 7, isRetrograde: false },
+            jupiter: { name: "Jupiter", sign: "Cancer", degree: 3.1, absoluteDegree: 93.1, house: 10, isRetrograde: false },
+            saturn: { name: "Saturn", sign: "Capricorn", degree: 22.4, absoluteDegree: 292.4, house: 4, isRetrograde: true },
+            uranus: { name: "Uranus", sign: "Capricorn", degree: 8.9, absoluteDegree: 278.9, house: 4, isRetrograde: false },
+            neptune: { name: "Neptune", sign: "Capricorn", degree: 14.2, absoluteDegree: 284.2, house: 4, isRetrograde: false },
+            pluto: { name: "Pluto", sign: "Scorpio", degree: 16.5, absoluteDegree: 226.5, house: 2, isRetrograde: true },
+          },
+          houses: {},
+          aspects: [],
+          ascendant: 0,
+          midheaven: 270,
+          computedAt: new Date().toISOString(),
+        };
+
+        setNatalChart(demoChart as any);
+
+        // Demo transits (current planetary positions)
+        updateTransits({
+          date: new Date().toISOString(),
+          transitPlanets: [
+            { name: "Sun", sign: "Capricorn", degree: 28.3, absoluteDegree: 298.3, house: 4, isRetrograde: false },
+            { name: "Moon", sign: "Leo", degree: 15.7, absoluteDegree: 135.7, house: 11, isRetrograde: false },
+            { name: "Mercury", sign: "Capricorn", degree: 12.1, absoluteDegree: 282.1, house: 4, isRetrograde: false },
+            { name: "Venus", sign: "Pisces", degree: 8.5, absoluteDegree: 338.5, house: 6, isRetrograde: false },
+            { name: "Mars", sign: "Cancer", degree: 22.4, absoluteDegree: 112.4, house: 10, isRetrograde: true },
+            { name: "Jupiter", sign: "Gemini", degree: 14.2, absoluteDegree: 74.2, house: 9, isRetrograde: false },
+            { name: "Saturn", sign: "Pisces", degree: 25.8, absoluteDegree: 355.8, house: 6, isRetrograde: false },
+          ] as any[],
+          aspects: [],
+          significantTransits: ["Mars Retrograde in Cancer"],
         });
       }
-    }, 2000);
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, [hasChart, natalPlanets.length]);
@@ -300,6 +352,9 @@ export default function SphereHome() {
 
         {/* 3D floating transit labels - appear when zoomed out */}
         <TransitLabels3D domeRadius={5} />
+
+        {/* Zodiac wheel chart - traditional wheel view when zoomed out */}
+        <ZodiacWheelChart radius={4} />
 
         {/* Navigation sphere */}
         <QuadrantSphere onQuadrantChange={handleQuadrantChange} />

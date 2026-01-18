@@ -115,9 +115,77 @@ export function usePlanetaryData() {
   };
 }
 
+// Fetch current transit positions (real-time planetary locations)
+export function useTransitData() {
+  const { updateTransits, setLoading, setError } = useAstrologyStore();
+
+  const fetchTransits = useCallback(async () => {
+    setLoading("transits", true);
+
+    try {
+      // Try to fetch from backend API
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/astrology/transits`,
+        { method: "GET" }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.transits) {
+          updateTransits(data.transits);
+          return;
+        }
+      }
+
+      // Fall back to demo transit data
+      loadDemoTransits();
+    } catch (error) {
+      console.warn("Failed to fetch transits, using demo data:", error);
+      loadDemoTransits();
+    } finally {
+      setLoading("transits", false);
+    }
+  }, [updateTransits, setLoading, setError]);
+
+  // Load demo transit data
+  const loadDemoTransits = useCallback(() => {
+    // Current approximate planetary positions (Jan 2026 - demo data)
+    const demoTransits: PlanetPosition[] = [
+      { name: "Sun", sign: "Capricorn", degree: 28.3, absoluteDegree: 298.3, house: 4, isRetrograde: false },
+      { name: "Moon", sign: "Leo", degree: 15.7, absoluteDegree: 135.7, house: 11, isRetrograde: false },
+      { name: "Mercury", sign: "Capricorn", degree: 12.1, absoluteDegree: 282.1, house: 4, isRetrograde: false },
+      { name: "Venus", sign: "Pisces", degree: 8.5, absoluteDegree: 338.5, house: 6, isRetrograde: false },
+      { name: "Mars", sign: "Cancer", degree: 22.4, absoluteDegree: 112.4, house: 10, isRetrograde: true },
+      { name: "Jupiter", sign: "Gemini", degree: 14.2, absoluteDegree: 74.2, house: 9, isRetrograde: false },
+      { name: "Saturn", sign: "Pisces", degree: 25.8, absoluteDegree: 355.8, house: 6, isRetrograde: false },
+      { name: "Uranus", sign: "Taurus", degree: 27.1, absoluteDegree: 57.1, house: 8, isRetrograde: true },
+      { name: "Neptune", sign: "Pisces", degree: 29.3, absoluteDegree: 359.3, house: 6, isRetrograde: false },
+      { name: "Pluto", sign: "Aquarius", degree: 3.6, absoluteDegree: 303.6, house: 5, isRetrograde: false },
+    ];
+
+    updateTransits({
+      date: new Date().toISOString(),
+      transitPlanets: demoTransits,
+      aspects: [],
+      significantTransits: ["Mars Retrograde in Cancer", "Saturn-Neptune conjunction approaching"],
+    });
+  }, [updateTransits]);
+
+  // Fetch transits on mount
+  useEffect(() => {
+    fetchTransits();
+
+    // Refresh transits every 10 minutes
+    const interval = setInterval(fetchTransits, 10 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [fetchTransits]);
+
+  return { fetchTransits };
+}
+
 // Demo data for testing (when no backend data available)
 export function useDemoPlanetaryData() {
-  const { setNatalChart } = useAstrologyStore();
+  const { setNatalChart, updateTransits } = useAstrologyStore();
 
   useEffect(() => {
     // Demo natal chart data
@@ -217,5 +285,26 @@ export function useDemoPlanetaryData() {
     };
 
     setNatalChart(demoChart);
-  }, [setNatalChart]);
+
+    // Also set demo transit data
+    const demoTransits: PlanetPosition[] = [
+      { name: "Sun", sign: "Capricorn", degree: 28.3, absoluteDegree: 298.3, house: 4, isRetrograde: false },
+      { name: "Moon", sign: "Leo", degree: 15.7, absoluteDegree: 135.7, house: 11, isRetrograde: false },
+      { name: "Mercury", sign: "Capricorn", degree: 12.1, absoluteDegree: 282.1, house: 4, isRetrograde: false },
+      { name: "Venus", sign: "Pisces", degree: 8.5, absoluteDegree: 338.5, house: 6, isRetrograde: false },
+      { name: "Mars", sign: "Cancer", degree: 22.4, absoluteDegree: 112.4, house: 10, isRetrograde: true },
+      { name: "Jupiter", sign: "Gemini", degree: 14.2, absoluteDegree: 74.2, house: 9, isRetrograde: false },
+      { name: "Saturn", sign: "Pisces", degree: 25.8, absoluteDegree: 355.8, house: 6, isRetrograde: false },
+      { name: "Uranus", sign: "Taurus", degree: 27.1, absoluteDegree: 57.1, house: 8, isRetrograde: true },
+      { name: "Neptune", sign: "Pisces", degree: 29.3, absoluteDegree: 359.3, house: 6, isRetrograde: false },
+      { name: "Pluto", sign: "Aquarius", degree: 3.6, absoluteDegree: 303.6, house: 5, isRetrograde: false },
+    ];
+
+    updateTransits({
+      date: new Date().toISOString(),
+      transitPlanets: demoTransits,
+      aspects: [],
+      significantTransits: ["Mars Retrograde in Cancer", "Saturn-Neptune conjunction"],
+    });
+  }, [setNatalChart, updateTransits]);
 }
