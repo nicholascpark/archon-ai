@@ -282,11 +282,17 @@ export default function SphereHome() {
         {/* Constellations layer (visible in sky mode, subtle in archon mode) */}
         <Constellations radius={7} />
 
-        {/* Dust effects disabled for cleaner visibility */}
-        {/* <RomanticAmbientEffects /> */}
-        {/* <CosmicZoomEffect /> */}
-        {/* <AmbientSparkles count={10} /> */}
-        {/* <SwipeTrailEffect /> */}
+        {/* Romantic ambient effects (shooting stars, floating particles) */}
+        <RomanticAmbientEffects />
+
+        {/* Cosmic zoom effect - magical dust streaming geometrically toward viewer */}
+        <CosmicZoomEffect />
+
+        {/* Ambient sparkles around sphere - reduced for cleaner view */}
+        <AmbientSparkles count={10} />
+
+        {/* Swipe trail effect (particles during drag) */}
+        <SwipeTrailEffect />
 
         {/* Swipe gesture direction indicators */}
         <SwipeGestureIndicators />
@@ -298,11 +304,12 @@ export default function SphereHome() {
         <TransitWindow />
       </SphereCanvas>
 
-      {/* Enhanced space-themed overlays - rendered via portal to document.body */}
+      {/* Enhanced space-themed overlays - temporarily disabled to fix UI blocking
       <EnhancedChatOverlay />
       <EnhancedMemoryOverlay />
       <EnhancedChartOverlay />
       <EnhancedSocialOverlay />
+      */}
 
       {/* UI overlays outside canvas */}
       <EnhancedQuadrantIndicator />
