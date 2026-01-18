@@ -123,7 +123,7 @@ function GlowingBorder({ color, active }: { color: string; active: boolean }) {
   );
 }
 
-// Base overlay window component
+// Base overlay window component - slide-up panel style (doesn't block 3D canvas)
 interface SpaceWindowProps {
   children: ReactNode;
   quadrant: QuadrantType;
@@ -139,7 +139,7 @@ export function SpaceWindow({ children, quadrant, isOpen, onClose, className }: 
   useEffect(() => {
     if (isOpen) {
       // Delay content reveal for dramatic effect
-      const timer = setTimeout(() => setShowContent(true), 200);
+      const timer = setTimeout(() => setShowContent(true), 150);
       return () => clearTimeout(timer);
     } else {
       setShowContent(false);
@@ -149,66 +149,65 @@ export function SpaceWindow({ children, quadrant, isOpen, onClose, className }: 
   return (
     <div
       className={cn(
-        "fixed inset-0 flex items-center justify-center p-4 z-[100]",
+        "fixed bottom-0 left-0 right-0 z-[80]",
         "transition-all duration-500 ease-out",
-        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        isOpen ? "pointer-events-auto" : "pointer-events-none"
       )}
     >
-      {/* Backdrop with cosmic blur */}
+      {/* Semi-transparent tap-to-close overlay (only covers bottom half) */}
       <div
         className={cn(
-          "absolute inset-0 backdrop-blur-md",
-          "transition-opacity duration-500",
+          "fixed inset-0 transition-opacity duration-300",
           isOpen ? "opacity-100" : "opacity-0"
         )}
         style={{
-          background: `radial-gradient(ellipse at center, ${theme.glow} 0%, rgba(10, 10, 20, 0.85) 70%)`,
+          background: "linear-gradient(to top, rgba(10, 10, 20, 0.6) 0%, transparent 60%)",
         }}
         onClick={onClose}
       />
 
-      {/* Main window */}
+      {/* Slide-up panel */}
       <div
         className={cn(
-          "relative w-full max-w-2xl mx-4",
-          "h-[60vh] max-h-[500px]",
-          "rounded-2xl overflow-hidden",
-          "transform transition-all duration-700 ease-out",
-          isOpen ? "scale-100 translate-y-0" : "scale-90 translate-y-8",
+          "relative w-full max-w-xl mx-auto",
+          "h-[50vh] max-h-[400px]",
+          "rounded-t-2xl overflow-hidden",
+          "transform transition-all duration-500 ease-out",
+          isOpen ? "translate-y-0" : "translate-y-full",
           className
         )}
         style={{
-          background: `linear-gradient(135deg, rgba(20, 20, 35, 0.95) 0%, rgba(10, 10, 20, 0.98) 100%)`,
+          background: `linear-gradient(135deg, rgba(20, 20, 35, 0.98) 0%, rgba(10, 10, 20, 0.99) 100%)`,
           border: `1px solid ${theme.border}`,
+          borderBottom: "none",
           boxShadow: `
-            0 0 40px ${theme.glow},
-            inset 0 0 60px rgba(0, 0, 0, 0.5),
-            0 25px 50px -12px rgba(0, 0, 0, 0.8)
+            0 -10px 40px ${theme.glow},
+            inset 0 0 40px rgba(0, 0, 0, 0.4)
           `,
         }}
       >
-        {/* Animated particles */}
-        <OverlayParticles color={theme.accent} />
+        {/* Pull handle indicator */}
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-12 h-1 rounded-full bg-cream/20" />
 
-        {/* Glowing border */}
-        <GlowingBorder color={theme.accent} active={isOpen} />
+        {/* Animated particles (reduced count for panel) */}
+        <OverlayParticles color={theme.accent} />
 
         {/* Window header */}
         <div
-          className="relative z-10 flex items-center justify-between px-6 py-4 border-b"
+          className="relative z-10 flex items-center justify-between px-5 py-3 border-b"
           style={{ borderColor: theme.border }}
         >
           <div className="flex items-center gap-3">
             {/* Animated icon */}
             <span
               className={cn(
-                "text-2xl transition-all duration-500",
+                "text-xl transition-all duration-400",
                 showContent ? "opacity-100 scale-100" : "opacity-0 scale-50"
               )}
               style={{
                 color: theme.accent,
-                textShadow: `0 0 20px ${theme.accent}, 0 0 40px ${theme.accent}40`,
-                filter: `drop-shadow(0 0 10px ${theme.accent})`,
+                textShadow: `0 0 15px ${theme.accent}`,
+                filter: `drop-shadow(0 0 8px ${theme.accent})`,
               }}
             >
               {theme.icon}
@@ -216,17 +215,17 @@ export function SpaceWindow({ children, quadrant, isOpen, onClose, className }: 
 
             <div
               className={cn(
-                "transition-all duration-500 delay-100",
+                "transition-all duration-400 delay-75",
                 showContent ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
               )}
             >
               <h2
-                className="font-serif text-lg tracking-wide"
+                className="font-serif text-base tracking-wide"
                 style={{ color: theme.accent }}
               >
                 {theme.title}
               </h2>
-              <p className="text-xs text-cream/40 font-light tracking-wider">
+              <p className="text-[10px] text-cream/40 font-light tracking-wider">
                 {theme.subtitle}
               </p>
             </div>
@@ -236,24 +235,24 @@ export function SpaceWindow({ children, quadrant, isOpen, onClose, className }: 
           <button
             onClick={onClose}
             className={cn(
-              "w-8 h-8 flex items-center justify-center rounded-full",
+              "w-7 h-7 flex items-center justify-center rounded-full",
               "transition-all duration-300",
-              "hover:bg-white/10"
+              "hover:bg-white/10 active:scale-90"
             )}
             style={{ color: theme.accent }}
           >
-            <span className="text-xl">×</span>
+            <span className="text-lg">×</span>
           </button>
         </div>
 
         {/* Content area */}
         <div
           className={cn(
-            "relative z-10 flex-1 overflow-y-auto p-6",
-            "transition-all duration-700 delay-200",
+            "relative z-10 flex-1 overflow-y-auto p-4",
+            "transition-all duration-500 delay-150",
             showContent ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           )}
-          style={{ height: "calc(100% - 70px)" }}
+          style={{ height: "calc(100% - 56px)" }}
         >
           {children}
         </div>

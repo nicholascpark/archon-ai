@@ -64,6 +64,26 @@ function StarField() {
   return null;
 }
 
+// OrbitControls wrapper - disables rotation during zoom transitions
+function OrbitControlsWrapper() {
+  const zoomLevel = useSphereStore((s) => s.zoomLevel);
+
+  // Disable controls when zoomed out to transit view (below 0.6)
+  // This prevents OrbitControls from fighting with CameraController
+  const isTransitView = zoomLevel < 0.6;
+
+  return (
+    <OrbitControls
+      enableZoom={false}
+      enablePan={false}
+      enableRotate={!isTransitView}
+      rotateSpeed={0.5}
+      dampingFactor={0.05}
+      enableDamping={!isTransitView}
+    />
+  );
+}
+
 export function SphereCanvas({ children, className }: SphereCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const quality = useSphereStore((s) => s.quality);
@@ -146,14 +166,8 @@ export function SphereCanvas({ children, className }: SphereCanvasProps) {
           {children}
         </Suspense>
 
-        {/* Orbit controls for development (will be replaced by gesture controls) */}
-        <OrbitControls
-          enableZoom={false}
-          enablePan={false}
-          rotateSpeed={0.5}
-          dampingFactor={0.05}
-          enableDamping
-        />
+        {/* Orbit controls - disabled during zoom transitions */}
+        <OrbitControlsWrapper />
       </Canvas>
 
       {/* Vignette overlay */}

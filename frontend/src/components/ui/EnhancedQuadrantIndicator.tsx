@@ -63,6 +63,8 @@ export function EnhancedQuadrantIndicator() {
   const swipeMode = useSphereStore((s) => s.swipeMode);
   const isTransitioning = useSphereStore((s) => s.isTransitioning);
   const isDragging = useSphereStore((s) => s.isDragging);
+  const overlayVisible = useSphereStore((s) => s.overlayVisible);
+  const setOverlayVisible = useSphereStore((s) => s.setOverlayVisible);
 
   const [showDescription, setShowDescription] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
@@ -83,26 +85,37 @@ export function EnhancedQuadrantIndicator() {
     }
   }, [isTransitioning, activeQuadrant]);
 
+  // Handle tap to open overlay
+  const handleTap = () => {
+    if (!isDragging && !isTransitioning) {
+      setOverlayVisible(!overlayVisible);
+    }
+  };
+
   // Don't show in sky mode
   if (swipeMode === "sky") return null;
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
       <div
         key={animationKey}
         className="relative animate-indicator-enter"
       >
-        {/* Main indicator */}
-        <div
+        {/* Main indicator - now clickable */}
+        <button
+          onClick={handleTap}
           className={`
             relative flex items-center gap-4 px-6 py-3
             bg-gradient-to-r ${config.bgGradient}
             backdrop-blur-md rounded-full
             border border-border/30
             transition-all duration-500 ease-out
+            cursor-pointer hover:scale-105 active:scale-95
           `}
           style={{
-            boxShadow: `0 0 30px ${config.color}20, 0 4px 20px rgba(0,0,0,0.3)`,
+            boxShadow: overlayVisible
+              ? `0 0 30px ${config.color}40, 0 4px 20px rgba(0,0,0,0.3), 0 0 0 2px ${config.color}60`
+              : `0 0 30px ${config.color}20, 0 4px 20px rgba(0,0,0,0.3)`,
           }}
         >
           {/* Sparkles during transition */}
@@ -157,15 +170,15 @@ export function EnhancedQuadrantIndicator() {
             </span>
           </div>
 
-          {/* Romantic icon */}
+          {/* Romantic icon / open indicator */}
           <span
             className={`text-lg transition-all duration-200 ${
               isDragging ? "scale-80 opacity-30" : "opacity-60"
             }`}
           >
-            {config.romanticIcon}
+            {overlayVisible ? "▼" : config.romanticIcon}
           </span>
-        </div>
+        </button>
 
         {/* Swipe direction hints (visible during drag) */}
         <div

@@ -305,12 +305,11 @@ export default function SphereHome() {
         <QuadrantSphere onQuadrantChange={handleQuadrantChange} />
       </SphereCanvas>
 
-      {/* Enhanced space-themed overlays - temporarily disabled to fix UI blocking
+      {/* Enhanced space-themed overlays - slide-up panels */}
       <EnhancedChatOverlay />
       <EnhancedMemoryOverlay />
       <EnhancedChartOverlay />
       <EnhancedSocialOverlay />
-      */}
 
       {/* TransitWindow popup removed - replaced by 3D floating TransitLabels3D inside Canvas */}
 
