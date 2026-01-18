@@ -299,9 +299,6 @@ export default function SphereHome() {
 
         {/* Navigation sphere */}
         <QuadrantSphere onQuadrantChange={handleQuadrantChange} />
-
-        {/* Transit window (appears when zoomed out) - disabled to fix UI blocking */}
-        {/* <TransitWindow /> */}
       </SphereCanvas>
 
       {/* Enhanced space-themed overlays - temporarily disabled to fix UI blocking
@@ -310,6 +307,9 @@ export default function SphereHome() {
       <EnhancedChartOverlay />
       <EnhancedSocialOverlay />
       */}
+
+      {/* Transit window (appears when zoomed out) - now outside Canvas */}
+      <TransitWindow />
 
       {/* UI overlays outside canvas */}
       <EnhancedQuadrantIndicator />

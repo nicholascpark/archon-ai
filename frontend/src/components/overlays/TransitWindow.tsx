@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useMemo } from "react";
-import { Html } from "@react-three/drei";
+import { useEffect, useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { useSphereStore } from "@/stores/useSphereStore";
 import { useAstrologyStore } from "@/stores/useAstrologyStore";
@@ -305,14 +304,14 @@ export function TransitWindow() {
   const isOpen = isTransitView && transitWindowOpen;
 
   return (
-    <Html center fullscreen style={{ pointerEvents: isOpen ? "auto" : "none" }}>
-      <div
-        className={cn(
-          "fixed inset-0 flex items-end justify-center pb-8",
-          "transition-all duration-700",
-          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        )}
-      >
+    <div
+      className={cn(
+        "fixed inset-0 flex items-end justify-center pb-8 z-[90]",
+        "transition-all duration-700",
+        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+      )}
+      style={{ pointerEvents: isOpen ? "auto" : "none" }}
+    >
         {/* Semi-transparent backdrop */}
         <div
           className="absolute inset-0 backdrop-blur-sm"
@@ -429,7 +428,7 @@ export function TransitWindow() {
           </div>
         </div>
       </div>
-    </Html>
+    </div>
   );
 }
 
