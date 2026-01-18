@@ -57,23 +57,10 @@ function Lighting() {
   );
 }
 
-// Star field background
+// Star field background - disabled to reduce visual clutter
+// The zodiac signs, planets, and constellation lines provide enough visual interest
 function StarField() {
-  const quality = useSphereStore((s) => s.quality);
-
-  const count = quality === "high" ? 5000 : quality === "medium" ? 2500 : 1000;
-
-  return (
-    <Stars
-      radius={100}
-      depth={50}
-      count={count}
-      factor={4}
-      saturation={0.1}
-      fade
-      speed={0.5}
-    />
-  );
+  return null;
 }
 
 export function SphereCanvas({ children, className }: SphereCanvasProps) {
