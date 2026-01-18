@@ -134,95 +134,99 @@ interface SpaceWindowProps {
 
 export function SpaceWindow({ children, quadrant, isOpen, onClose, className }: SpaceWindowProps) {
   const theme = OVERLAY_THEMES[quadrant];
+  const [showContent, setShowContent] = useState(false);
 
-  // Don't render anything if not open
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen) {
+      // Delay content reveal for dramatic effect
+      const timer = setTimeout(() => setShowContent(true), 200);
+      return () => clearTimeout(timer);
+    } else {
+      setShowContent(false);
+    }
+  }, [isOpen]);
 
   return (
     <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 9999,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "16px",
-      }}
+      className={cn(
+        "fixed inset-0 flex items-center justify-center p-4 z-[100]",
+        "transition-all duration-500 ease-out",
+        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+      )}
     >
-      {/* Dark backdrop */}
+      {/* Backdrop with cosmic blur */}
       <div
-        onClick={onClose}
+        className={cn(
+          "absolute inset-0 backdrop-blur-md",
+          "transition-opacity duration-500",
+          isOpen ? "opacity-100" : "opacity-0"
+        )}
         style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.8)",
-          backdropFilter: "blur(4px)",
+          background: `radial-gradient(ellipse at center, ${theme.glow} 0%, rgba(10, 10, 20, 0.85) 70%)`,
         }}
+        onClick={onClose}
       />
 
-      {/* Modal window - centered */}
+      {/* Main window */}
       <div
+        className={cn(
+          "relative w-full max-w-2xl mx-4",
+          "h-[60vh] max-h-[500px]",
+          "rounded-2xl overflow-hidden",
+          "transform transition-all duration-700 ease-out",
+          isOpen ? "scale-100 translate-y-0" : "scale-90 translate-y-8",
+          className
+        )}
         style={{
-          position: "relative",
-          width: "100%",
-          maxWidth: "500px",
-          maxHeight: "70vh",
-          backgroundColor: "#1a1a2e",
-          borderRadius: "16px",
-          border: `2px solid ${theme.accent}`,
-          boxShadow: `0 0 30px ${theme.glow}, 0 20px 40px rgba(0,0,0,0.5)`,
-          overflow: "hidden",
-          display: "flex",
-          flexDirection: "column",
+          background: `linear-gradient(135deg, rgba(20, 20, 35, 0.95) 0%, rgba(10, 10, 20, 0.98) 100%)`,
+          border: `1px solid ${theme.border}`,
+          boxShadow: `
+            0 0 40px ${theme.glow},
+            inset 0 0 60px rgba(0, 0, 0, 0.5),
+            0 25px 50px -12px rgba(0, 0, 0, 0.8)
+          `,
         }}
       >
-        {/* Header */}
+        {/* Animated particles */}
+        <OverlayParticles color={theme.accent} />
+
+        {/* Glowing border */}
+        <GlowingBorder color={theme.accent} active={isOpen} />
+
+        {/* Window header */}
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "16px 20px",
-            borderBottom: `1px solid ${theme.border}`,
-            backgroundColor: "rgba(0,0,0,0.3)",
-          }}
+          className="relative z-10 flex items-center justify-between px-6 py-4 border-b"
+          style={{ borderColor: theme.border }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div className="flex items-center gap-3">
+            {/* Animated icon */}
             <span
+              className={cn(
+                "text-2xl transition-all duration-500",
+                showContent ? "opacity-100 scale-100" : "opacity-0 scale-50"
+              )}
               style={{
-                fontSize: "24px",
                 color: theme.accent,
-                textShadow: `0 0 10px ${theme.accent}`,
+                textShadow: `0 0 20px ${theme.accent}, 0 0 40px ${theme.accent}40`,
+                filter: `drop-shadow(0 0 10px ${theme.accent})`,
               }}
             >
               {theme.icon}
             </span>
-            <div>
+
+            <div
+              className={cn(
+                "transition-all duration-500 delay-100",
+                showContent ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
+              )}
+            >
               <h2
-                style={{
-                  margin: 0,
-                  fontSize: "18px",
-                  fontWeight: 500,
-                  color: theme.accent,
-                  letterSpacing: "0.05em",
-                }}
+                className="font-serif text-lg tracking-wide"
+                style={{ color: theme.accent }}
               >
                 {theme.title}
               </h2>
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "12px",
-                  color: "rgba(255,255,255,0.4)",
-                }}
-              >
+              <p className="text-xs text-cream/40 font-light tracking-wider">
                 {theme.subtitle}
               </p>
             </div>
@@ -231,32 +235,25 @@ export function SpaceWindow({ children, quadrant, isOpen, onClose, className }: 
           {/* Close button */}
           <button
             onClick={onClose}
-            style={{
-              width: "32px",
-              height: "32px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: "50%",
-              border: "none",
-              backgroundColor: "rgba(255,255,255,0.1)",
-              color: theme.accent,
-              fontSize: "20px",
-              cursor: "pointer",
-            }}
+            className={cn(
+              "w-8 h-8 flex items-center justify-center rounded-full",
+              "transition-all duration-300",
+              "hover:bg-white/10"
+            )}
+            style={{ color: theme.accent }}
           >
-            ×
+            <span className="text-xl">×</span>
           </button>
         </div>
 
         {/* Content area */}
         <div
-          style={{
-            flex: 1,
-            overflow: "auto",
-            padding: "20px",
-            color: "rgba(255,255,255,0.8)",
-          }}
+          className={cn(
+            "relative z-10 flex-1 overflow-y-auto p-6",
+            "transition-all duration-700 delay-200",
+            showContent ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          )}
+          style={{ height: "calc(100% - 70px)" }}
         >
           {children}
         </div>

@@ -113,13 +113,22 @@ function ZodiacDivisions({ radius }: { radius: number }) {
   return <>{lines}</>;
 }
 
-// Aspect lines between planets
+// Aspect lines between planets - enhanced for transit view
 function AspectLines({ radius }: { radius: number }) {
   const natalPlanets = useAstrologyStore((s) => s.natalPlanets);
   const quality = useSphereStore((s) => s.quality);
+  const zoomLevel = useSphereStore((s) => s.zoomLevel);
 
   // Only show aspects in high quality mode
   if (quality === "low" || natalPlanets.length < 2) return null;
+
+  // Calculate enhancement factor based on zoom (more prominent when zoomed out)
+  // zoomLevel 1.0+ = normal, zoomLevel 0.3 = max enhanced
+  const enhancementFactor = Math.max(0, Math.min(1, (1.0 - zoomLevel) / 0.7));
+
+  // Enhanced opacity and visual properties when zoomed out
+  const baseOpacity = 0.3;
+  const enhancedOpacity = baseOpacity + enhancementFactor * 0.5; // Up to 0.8
 
   const aspectLines = useMemo(() => {
     const lines: React.ReactNode[] = [];
@@ -148,14 +157,14 @@ function AspectLines({ radius }: { radius: number }) {
             const pos1 = eclipticTo3D(p1.absoluteDegree, 15, radius);
             const pos2 = eclipticTo3D(p2.absoluteDegree, 15, radius);
 
-            // Create curved line
+            // Create curved line with higher arc when zoomed out
             const midPoint = new THREE.Vector3()
               .addVectors(pos1, pos2)
               .multiplyScalar(0.5);
-            midPoint.y += 0.5; // Curve upward
+            midPoint.y += 0.5 + enhancementFactor * 0.8; // Higher arc when zoomed
 
             const curve = new THREE.QuadraticBezierCurve3(pos1, midPoint, pos2);
-            const points = curve.getPoints(20);
+            const points = curve.getPoints(24); // More segments for smoother curve
             const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
             lines.push(
@@ -164,11 +173,27 @@ function AspectLines({ radius }: { radius: number }) {
                 <lineBasicMaterial
                   color={aspect.color}
                   transparent
-                  opacity={0.3}
+                  opacity={enhancedOpacity}
                   linewidth={1}
                 />
               </line>
             );
+
+            // Add glow effect when zoomed out (secondary line with lower opacity)
+            if (enhancementFactor > 0.3) {
+              const glowGeometry = new THREE.BufferGeometry().setFromPoints(points);
+              lines.push(
+                <line key={`aspect-glow-${i}-${j}`}>
+                  <bufferGeometry attach="geometry" {...glowGeometry} />
+                  <lineBasicMaterial
+                    color={aspect.color}
+                    transparent
+                    opacity={enhancementFactor * 0.15}
+                    linewidth={3}
+                  />
+                </line>
+              );
+            }
             break;
           }
         }
@@ -176,7 +201,7 @@ function AspectLines({ radius }: { radius: number }) {
     }
 
     return lines;
-  }, [natalPlanets, radius]);
+  }, [natalPlanets, radius, enhancedOpacity, enhancementFactor]);
 
   return <>{aspectLines}</>;
 }

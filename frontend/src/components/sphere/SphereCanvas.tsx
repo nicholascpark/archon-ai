@@ -5,6 +5,7 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera, Stars, AdaptiveDpr } from "@react-three/drei";
 import { cn } from "@/lib/utils";
 import { useSphereStore } from "@/stores/useSphereStore";
+import { CameraController } from "./CameraController";
 import type { SphereCanvasProps } from "@/types/sphere";
 
 // Loading fallback
@@ -127,6 +128,9 @@ export function SphereCanvas({ children, className }: SphereCanvasProps) {
           near={0.1}
           far={200}
         />
+
+        {/* Camera animation controller - handles smooth zoom transitions */}
+        <CameraController />
 
         {/* Fog for depth */}
         <fog attach="fog" args={["#0a0908", 15, 100]} />

@@ -53,14 +53,15 @@ const EnhancedSocialOverlay = dynamic(
   { ssr: false }
 );
 
-// Transit window and zoom controls
-const TransitWindow = dynamic(
-  () => import("@/components/overlays/TransitWindow").then((mod) => mod.TransitWindow),
+// Zoom controls (TransitWindow replaced by 3D floating labels)
+const ZoomControls = dynamic(
+  () => import("@/components/overlays/TransitWindow").then((mod) => mod.ZoomControls),
   { ssr: false }
 );
 
-const ZoomControls = dynamic(
-  () => import("@/components/overlays/TransitWindow").then((mod) => mod.ZoomControls),
+// 3D floating transit labels (replaces popup TransitWindow)
+const TransitLabels3D = dynamic(
+  () => import("@/components/sphere/TransitLabels3D").then((mod) => mod.TransitLabels3D),
   { ssr: false }
 );
 
@@ -297,6 +298,9 @@ export default function SphereHome() {
         {/* Swipe gesture direction indicators */}
         <SwipeGestureIndicators />
 
+        {/* 3D floating transit labels - appear when zoomed out */}
+        <TransitLabels3D domeRadius={5} />
+
         {/* Navigation sphere */}
         <QuadrantSphere onQuadrantChange={handleQuadrantChange} />
       </SphereCanvas>
@@ -308,8 +312,7 @@ export default function SphereHome() {
       <EnhancedSocialOverlay />
       */}
 
-      {/* Transit window (appears when zoomed out) - now outside Canvas */}
-      <TransitWindow />
+      {/* TransitWindow popup removed - replaced by 3D floating TransitLabels3D inside Canvas */}
 
       {/* UI overlays outside canvas */}
       <EnhancedQuadrantIndicator />
