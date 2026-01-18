@@ -300,8 +300,8 @@ export default function SphereHome() {
         {/* Navigation sphere */}
         <QuadrantSphere onQuadrantChange={handleQuadrantChange} />
 
-        {/* Transit window (appears when zoomed out) */}
-        <TransitWindow />
+        {/* Transit window (appears when zoomed out) - disabled to fix UI blocking */}
+        {/* <TransitWindow /> */}
       </SphereCanvas>
 
       {/* Enhanced space-themed overlays - temporarily disabled to fix UI blocking
