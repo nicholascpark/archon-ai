@@ -28,7 +28,7 @@ const initialState = {
   isDragging: false,
   velocity: { x: 0, y: 0 },
   isTransitioning: false,
-  overlayVisible: true,
+  overlayVisible: false,
   showModeShiftPulse: false,
   hoveredConstellation: null as string | null,
   quality: "high" as const,
