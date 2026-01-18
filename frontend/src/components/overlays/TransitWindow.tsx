@@ -427,7 +427,6 @@ export function TransitWindow() {
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 }
